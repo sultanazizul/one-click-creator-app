@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>One Click Creator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}" type="image/png">
+
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+            <span>One Click Creator</span>
+        </div>
+        <nav>
+            <div class="nav-section">
+                <h3>Dashboard</h3>
+                <ul>
+                    <li><a href="{{ url_for('index') }}" class="{{ 'active' if active_page == 'dashboard' else '' }}"><span>🏠</span> Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="nav-section">
+                <h3> FACELESS CONTENT IDEAS</h3>
+                <ul>
+                    <li><a href="{{ url_for('idea_to_video') }}" class="{{ 'active' if active_page == 'idea_to_video' else '' }}"><span>🎬</span> Idea to Video</a></li>
+                    <li><a href="{{ url_for('clips_generator') }}" class="{{ 'active' if active_page == 'clips_generator' else '' }}"><span>🎥</span> Clips Generator</a></li>
+                    <li><a href="{{ url_for('news_content') }}" class="{{ 'active' if active_page == 'news_content' else '' }}"><span>📰</span> News Content</a></li>
+                </ul>
+            </div>            
+            <div class="nav-section">
+                <h3>AUDIO TOOLS</h3>
+                <ul>
+                    <li><a href="{{ url_for('text_to_speech') }}" class="{{ 'active' if active_page == 'text_to_speech' else '' }}"><span>🎙️</span> Text to Speech</a></li>
+                    <li><a href="{{ url_for('speech_to_text') }}" class="{{ 'active' if active_page == 'speech_to_text' else '' }}"><span>🔊</span> Speech to Text</a></li>
+                    <li><a href="{{ url_for('audio_dubbing') }}" class="{{ 'active' if active_page == 'audio_dubbing' else '' }}"><span>🎙️</span> Audio Dubbing</a></li>
+                </ul>
+            </div>
+            <div class="nav-section">
+                <h3>VIDEO TOOLS</h3>
+                <ul>
+                    <li><a href="{{ url_for('subtitle_generator') }}" class="{{ 'active' if active_page == 'subtitle_generator' else '' }}"><span>📋</span> Subtitle Generator</a></li>
+                    <li><a href="{{ url_for('metadata_generator') }}" class="{{ 'active' if active_page == 'metadata_generator' else '' }}"><span>📊</span> Metadata Generator</a></li>
+                </ul>
+            </div>
+            <div class="nav-section">
+                <h3>DESIGN TOOLS</h3>
+                <ul>
+                    <li><a href="{{ url_for('image_gen') }}" class="{{ 'active' if active_page == 'image_gen' else '' }}"><span>🖼️</span> Image Generation</a></li>
+                    <li><a href="{{ url_for('thumbnail_gen') }}" class="{{ 'active' if active_page == 'thumbnail_gen' else '' }}"><span>📸</span> Thumbnail</a></li>
+                    <li><a href="{{ url_for('carousel_gen') }}" class="{{ 'active' if active_page == 'carousel_gen' else '' }}"><span>🔄</span> Carousel</a></li>
+                </ul>
+            </div>            
+            <div class="nav-section">
+                <h3>RESEARCH TOOLS</h3>
+                <ul>
+                    <li><a href="{{ url_for('trending_videos') }}" class="{{ 'active' if active_page == 'trending_videos' else '' }}"><span>📈</span> Trending Videos</a></li>
+                    <li><a href="{{ url_for('competitor_creator') }}" class="{{ 'active' if active_page == 'competitor_creator' else '' }}"><span>🥷</span> Competitor Creator</a></li>
+                </ul>
+            </div>
+            <div class="nav-section">
+                <h3>DOWNLOADER</h3>
+                <ul>
+                    <li><a href="{{ url_for('video_download') }}" class="{{ 'active' if active_page == 'video_download' else '' }}"><span>📥</span> Video Download</a></li>
+                    <li><a href="{{ url_for('audio_download') }}" class="{{ 'active' if active_page == 'audio_download' else '' }}"><span>🎵</span> Audio Download</a></li>
+                    <li><a href="{{ url_for('transcript') }}" class="{{ 'active' if active_page == 'transcript_download' else '' }}"><span>📝</span> Transcript Download</a></li>
+                </ul>
+            </div>
+            
+        </nav>
+    </div>
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

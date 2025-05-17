@@ -1,0 +1,6 @@
+# Ignore large video and audio files
+*.mp4
+*.mp3
+projects/**/*.mp4
+projects/**/*.mp3
+exports/*.mp4

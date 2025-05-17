@@ -1,0 +1,167 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="content-header">
+    <h1>Transcript Generator</h1>
+    <p>Generate transcripts from videos or audio files</p>
+</div>
+
+<div class="max-w-2xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg">
+    <!-- Input Selection -->
+    <div class="mb-6">
+        <label class="block text-gray-300 mb-2">Select Input Type</label>
+        <div class="flex space-x-4">
+            <label class="flex items-center space-x-2">
+                <input type="radio" name="inputType" value="url" class="form-radio text-blue-500" checked onclick="toggleInputType()">
+                <span class="text-gray-300">URL (Instagram/TikTok/YouTube)</span>
+            </label>
+            <label class="flex items-center space-x-2">
+                <input type="radio" name="inputType" value="file" class="form-radio text-blue-500" onclick="toggleInputType()">
+                <span class="text-gray-300">Upload File</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Input Form -->
+    <div id="inputForm" class="mb-6">
+        <div id="urlInput" class="block">
+            <label for="url" class="block text-gray-300 mb-2">Video URL</label>
+            <input type="text" id="url" name="url" placeholder="Enter Instagram, TikTok, or YouTube URL" class="w-full p-3 bg-gray-800 text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div id="fileInput" class="hidden">
+            <label for="file" class="block text-gray-300 mb-2">Upload Audio/Video File</label>
+            <input type="file" id="file" name="file" accept="audio/*,video/*" class="w-full p-3 bg-gray-800 text-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+        </div>
+    </div>
+
+    <!-- Generate Button -->
+    <button onclick="generateTranscript()" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Generate Transcript</button>
+
+    <!-- Transcript Output -->
+    <div id="transcriptContainer" class="mt-6 hidden">
+        <label class="block text-gray-300 mb-2">Transcript</label>
+        <textarea id="transcriptOutput" class="w-full p-3 bg-gray-800 text-gray-300 rounded-lg h-48 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Transcript will appear here..."></textarea>
+        <div class="flex space-x-4 mt-4">
+            <button onclick="downloadTranscript()" class="flex-1 p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Download Transcript</button>
+            <button onclick="clearTranscript()" class="flex-1 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Clear</button>
+        </div>
+    </div>
+
+    <!-- Log Container -->
+    <div id="logContainer" class="mt-6">
+        <h3 class="text-gray-300 mb-2">Process Log</h3>
+        <pre id="logs" class="p-3 bg-gray-800 text-gray-300 rounded-lg h-24 overflow-y-auto"></pre>
+    </div>
+</div>
+
+<script>
+let logs = [];
+
+function addLog(message) {
+    logs.push(`${new Date().toLocaleTimeString()}: ${message}`);
+    document.getElementById('logs').innerHTML = logs.join('\n');
+}
+
+function toggleInputType() {
+    const inputType = document.querySelector('input[name="inputType"]:checked').value;
+    document.getElementById('urlInput').classList.toggle('hidden', inputType !== 'url');
+    document.getElementById('fileInput').classList.toggle('hidden', inputType !== 'file');
+    addLog(`Switched input type to: ${inputType}`);
+}
+
+function generateTranscript() {
+    const inputType = document.querySelector('input[name="inputType"]:checked').value;
+    const formData = new FormData();
+
+    formData.append('action', 'generate_transcript');
+    formData.append('input_type', inputType);
+
+    if (inputType === 'url') {
+        const url = document.getElementById('url').value;
+        if (!url) {
+            addLog('Error: URL is required');
+            return;
+        }
+        formData.append('url', url);
+        addLog('Generating transcript from URL...');
+    } else {
+        const fileInput = document.getElementById('file');
+        if (!fileInput.files.length) {
+            addLog('Error: No file selected');
+            return;
+        }
+        formData.append('file', fileInput.files[0]);
+        addLog('Generating transcript from uploaded file...');
+    }
+
+    fetch('/transcript', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Unknown error');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('transcriptOutput').value = data.transcript;
+        document.getElementById('transcriptContainer').classList.remove('hidden');
+        addLog('Transcript generated successfully');
+    })
+    .catch(error => {
+        addLog(`Error generating transcript: ${error.message}`);
+        console.error('Error generating transcript:', error);
+    });
+}
+
+function downloadTranscript() {
+    const transcript = document.getElementById('transcriptOutput').value;
+    if (!transcript) {
+        addLog('Error: No transcript to download');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'download_transcript');
+    formData.append('transcript', transcript);
+
+    fetch('/transcript', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Unknown error');
+            });
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'transcript.txt';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        addLog('Transcript downloaded successfully');
+    })
+    .catch(error => {
+        addLog(`Error downloading transcript: ${error.message}`);
+        console.error('Error downloading transcript:', error);
+    });
+}
+
+function clearTranscript() {
+    document.getElementById('transcriptOutput').value = '';
+    document.getElementById('transcriptContainer').classList.add('hidden');
+    document.getElementById('url').value = '';
+    document.getElementById('file').value = '';
+    addLog('Transcript cleared');
+}
+</script>
+{% endblock %}

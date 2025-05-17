@@ -1,0 +1,10 @@
+Flask==2.1.1
+Werkzeug==2.0.3
+moviepy==1.0.3
+requests==2.31.0
+python-dotenv
+sentence-transformers==2.2.2
+pexels-api==1.0.1
+gTTS==2.2.3
+openai==0.11.3
+numpy<2

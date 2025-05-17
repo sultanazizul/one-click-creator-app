@@ -1,0 +1,568 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="content-header">
+    <h1>Idea to Video</h1>
+    <p>Create engaging videos with AI-generated stories</p>
+    <button class="create-prompt" id="newProjectBtn">+ New Video Project</button>
+</div>
+
+<div id="promptForm" style="display:none;" class="prompt-form">
+    <form id="videoForm">
+        <div class="form-group">
+            <label for="prompt">Your Video Idea</label>
+            <textarea name="prompt" id="prompt" placeholder="Enter your video idea (e.g., 'Bermain Bola dengan teman teman malah ketemu Kambing')"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="theme">Theme</label>
+            <select name="theme" id="theme">
+                <option value="none">None</option>
+                <option value="inspiration">Inspiration</option>
+                <option value="education">Education</option>
+                <option value="romance">Romance</option>
+                <option value="comedy">Comedy</option>
+                <option value="adventure">Adventure</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="suggested-titles" style="display:none;">
+            <label>Suggested Titles</label>
+            <select name="suggested_title" id="suggested_title">
+                <option value="">None</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <div class="duration-group">
+                <label for="duration">Duration:</label>
+                <select name="duration" id="duration">
+                    <option value="short">Short (30sec - 1min)</option>
+                    <option value="medium">Medium (1min - 3min)</option>
+                    <option value="long">Long (> 5min)</option>
+                </select>
+            </div>
+            <div class="ratio-group">
+                <label for="video_ratio">Video Ratio:</label>
+                <select name="video_ratio" id="video_ratio">
+                    <option value="16:9">Landscape (16:9)</option>
+                    <option value="9:16">Vertical (9:16)</option>
+                    <option value="1:1">Square (1:1)</option>
+                </select>
+            </div>
+            <button type="button" onclick="generateStory()">Generate Story</button>
+            <button type="button" onclick="cancelForm()" class="cancel-btn">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<div id="storyContainer" class="story-container" style="display:none;">
+    <pre id="storyOutput" contenteditable="false"></pre>
+    <div class="story-actions">
+        <button id="editBtn" onclick="toggleEdit()">Edit</button>
+        <button onclick="regenerateStory()">Regenerate</button>
+        <button onclick="confirmStory()">Confirm</button>
+    </div>
+</div>
+
+<div id="videoMatchingContainer" class="video-matching-container" style="display:none;">
+    <button onclick="generateVoiceOvers()">Generate VO</button>
+    <button onclick="findVideos()">Find Videos</button>
+    <div id="sceneVideos" class="scene-videos-grid"></div>
+    <button id="generateVideoBtn" style="display:none;" onclick="generateVideo()">Generate Video</button>
+</div>
+
+<div id="videoResult" class="video-result">
+    <div id="loadingAnimation" class="loading-animation" style="display:none;">
+        <div class="spinner"></div>
+        <p>Generating video...</p>
+    </div>
+    <video id="generatedVideo" controls style="display:none;"></video>
+    <button id="exportVideoBtn" style="display:none;" onclick="exportVideo()">Export Video</button>
+</div>
+<div id="logContainer" class="log-container">
+    <h3>Process Log</h3>
+    <pre id="logs"></pre>
+</div>
+
+<script>
+let logs = [];
+let isEditing = false;
+let sceneData = {};
+let projectTitle = '';
+
+function addLog(message) {
+    logs.push(`${new Date().toLocaleTimeString()}: ${message}`);
+    const logElement = document.getElementById('logs');
+    if (logElement) {
+        logElement.innerHTML = logs.join('\n');
+        logElement.scrollTop = logElement.scrollHeight; // Auto-scroll to the latest log
+    } else {
+        console.error('Log container not found');
+    }
+}
+
+function showPromptForm() {
+    const promptForm = document.getElementById('promptForm');
+    if (promptForm) {
+        promptForm.style.display = 'block';
+        addLog('Opened new video project form');
+    } else {
+        addLog('Error: promptForm element not found');
+        console.error('promptForm element not found');
+    }
+}
+
+function cancelForm() {
+    const promptForm = document.getElementById('promptForm');
+    if (promptForm) {
+        promptForm.style.display = 'none';
+        document.getElementById('storyContainer').style.display = 'none';
+        document.getElementById('videoMatchingContainer').style.display = 'none';
+        document.getElementById('videoResult').innerHTML = '';
+        fetch('/idea_to_video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=clean_temp_data&project_title=${encodeURIComponent(projectTitle)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                addLog('Cleaned up temporary data');
+            }
+        })
+        .catch(error => {
+            addLog(`Error cleaning up temporary data: ${error.message}`);
+            console.error('Error cleaning up temporary data:', error);
+        });
+        logs = [];
+        document.getElementById('logs').innerHTML = '';
+        addLog('Cancelled video project');
+    } else {
+        addLog('Error: promptForm element not found for cancellation');
+        console.error('promptForm element not found for cancellation');
+    }
+}
+
+try {
+    const newProjectBtn = document.getElementById('newProjectBtn');
+    if (newProjectBtn) {
+        newProjectBtn.addEventListener('click', function() {
+            addLog('New project button clicked');
+            showPromptForm();
+        });
+        addLog('Successfully attached event listener to newProjectBtn');
+    } else {
+        addLog('Error: newProjectBtn element not found');
+        console.error('newProjectBtn element not found');
+    }
+
+    const themeSelect = document.getElementById('theme');
+    if (themeSelect) {
+        themeSelect.addEventListener('change', function() {
+            const theme = this.value;
+            addLog(`Theme selected: ${theme}`);
+            if (theme === 'none') {
+                document.getElementById('suggested-titles').style.display = 'none';
+            } else {
+                fetchSuggestedTitles(theme);
+            }
+        });
+    } else {
+        addLog('Error: theme select element not found');
+        console.error('theme select element not found');
+    }
+
+    const suggestedTitleSelect = document.getElementById('suggested_title');
+    if (suggestedTitleSelect) {
+        suggestedTitleSelect.addEventListener('change', function() {
+            const title = this.value;
+            addLog(`Suggested title selected: ${title || 'None'}`);
+        });
+    } else {
+        addLog('Error: suggested_title select element not found');
+        console.error('suggested_title select element not found');
+    }
+
+    const videoRatioSelect = document.getElementById('video_ratio');
+    if (videoRatioSelect) {
+        videoRatioSelect.addEventListener('change', function() {
+            const ratio = this.value;
+            addLog(`Video ratio selected: ${ratio}`);
+        });
+    } else {
+        addLog('Error: video_ratio select element not found');
+        console.error('video_ratio select element not found');
+    }
+} catch (e) {
+    addLog(`Error attaching event listeners: ${e.message}`);
+    console.error('Error attaching event listeners:', e);
+}
+
+function fetchSuggestedTitles(theme) {
+    fetch('/get_suggested_titles?theme=' + theme)
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('suggested_title');
+            select.innerHTML = '<option value="">None</option>';
+            data.titles.forEach(title => {
+                const option = document.createElement('option');
+                option.value = title;
+                option.textContent = title;
+                select.appendChild(option);
+            });
+            document.getElementById('suggested-titles').style.display = 'block';
+            addLog(`Loaded suggested titles for ${theme}`);
+        })
+        .catch(error => {
+            addLog(`Error fetching suggested titles: ${error.message}`);
+            console.error('Error fetching suggested titles:', error);
+        });
+}
+
+function generateStory() {
+    const prompt = document.querySelector('textarea[name="prompt"]').value || 
+                  document.getElementById('suggested_title').value;
+    const theme = document.getElementById('theme').value;
+    const duration = document.getElementById('duration').value;
+    const video_ratio = document.getElementById('video_ratio').value;
+    
+    addLog('Generating story...');
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `prompt=${encodeURIComponent(prompt)}&theme=${theme}&duration=${duration}&video_ratio=${encodeURIComponent(video_ratio)}&action=generate_story`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        const storyOutput = document.getElementById('storyOutput');
+        if (storyOutput) {
+            storyOutput.textContent = data.story;
+            projectTitle = data.project_title;
+            document.getElementById('storyContainer').style.display = 'block';
+            addLog(`Story generated successfully, Project Title: ${projectTitle}`);
+        } else {
+            addLog('Error: storyOutput element not found in DOM');
+            console.error('storyOutput element not found');
+        }
+    })
+    .catch(error => {
+        addLog(`Error generating story: ${error.message}`);
+        console.error('Error generating story:', error);
+    });
+}
+
+function toggleEdit() {
+    const storyOutput = document.getElementById('storyOutput');
+    if (storyOutput) {
+        isEditing = !isEditing;
+        storyOutput.contentEditable = isEditing;
+        document.getElementById('editBtn').textContent = isEditing ? 'Save' : 'Edit';
+        
+        if (!isEditing) {
+            addLog('Story edits saved');
+        } else {
+            addLog('Editing story...');
+        }
+    } else {
+        addLog('Error: storyOutput element not found for editing');
+        console.error('storyOutput element not found for editing');
+    }
+}
+
+function regenerateStory() {
+    const prompt = document.querySelector('textarea[name="prompt"]').value || 
+                  document.getElementById('suggested_title').value;
+    const theme = document.getElementById('theme').value;
+    const duration = document.getElementById('duration').value;
+    const video_ratio = document.getElementById('video_ratio').value;
+    
+    addLog('Regenerating story...');
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `prompt=${encodeURIComponent(prompt)}&theme=${theme}&duration=${duration}&video_ratio=${encodeURIComponent(video_ratio)}&action=regenerate`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        const storyOutput = document.getElementById('storyOutput');
+        if (storyOutput) {
+            storyOutput.textContent = data.story;
+            projectTitle = data.project_title;
+            storyOutput.contentEditable = false;
+            document.getElementById('editBtn').textContent = 'Edit';
+            isEditing = false;
+            addLog(`Story regenerated successfully, Project Title: ${projectTitle}`);
+        } else {
+            addLog('Error: storyOutput element not found in DOM');
+            console.error('storyOutput element not found');
+        }
+    })
+    .catch(error => {
+        addLog(`Error regenerating story: ${error.message}`);
+        console.error('Error regenerating story:', error);
+    });
+}
+
+function confirmStory() {
+    const story = document.getElementById('storyOutput')?.textContent || '';
+    if (!story) {
+        addLog('Error: No story content available for confirmation');
+        console.error('No story content available for confirmation');
+        return;
+    }
+    addLog(`Creating project directories for: ${projectTitle}`);
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=create_project&project_title=${encodeURIComponent(projectTitle)}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            const lines = story.split('\n').filter(line => line.trim());
+            sceneData = {};
+            let currentScene = null;
+            lines.forEach(line => {
+                if (line.startsWith('Scene:')) {
+                    currentScene = line.replace('Scene:', '').trim();
+                } else if (line.startsWith('Script:')) {
+                    const script = line.replace('Script:', '').trim();
+                    sceneData[currentScene] = { script: script, video: null, audio: null };
+                }
+            });
+            document.getElementById('videoMatchingContainer').style.display = 'block';
+            addLog('Project directories created, proceeding to VO and video search');
+        }
+    })
+    .catch(error => {
+        addLog(`Error creating project directories: ${error.message}`);
+        console.error('Error creating project directories:', error);
+    });
+}
+
+function generateVoiceOvers() {
+    if (Object.keys(sceneData).length === 0) {
+        const story = document.getElementById('storyOutput')?.textContent || '';
+        if (!story) {
+            addLog('Error: No story content available for VO generation');
+            console.error('No story content available for VO generation');
+            return;
+        }
+        const lines = story.split('\n').filter(line => line.trim());
+        let currentScene = null;
+        lines.forEach(line => {
+            if (line.startsWith('Scene:')) {
+                currentScene = line.replace('Scene:', '').trim();
+            } else if (line.startsWith('Script:')) {
+                const script = line.replace('Script:', '').trim();
+                sceneData[currentScene] = sceneData[currentScene] || { script: script, video: null, audio: null };
+            }
+        });
+    }
+
+    addLog('Generating voice-overs for each scene...');
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=generate_audio&scene_data=${encodeURIComponent(JSON.stringify(sceneData))}&project_title=${encodeURIComponent(projectTitle)}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        Object.keys(sceneData).forEach(scene => {
+            sceneData[scene].audio = data.audios[scene];
+        });
+        displayVideos();
+        addLog('Voice-overs generated successfully');
+    })
+    .catch(error => {
+        addLog(`Error generating voice-overs: ${error.message}`);
+        console.error('Error generating voice-overs:', error);
+    });
+}
+
+function findVideos() {
+    if (Object.keys(sceneData).length === 0) {
+        const story = document.getElementById('storyOutput')?.textContent || '';
+        if (!story) {
+            addLog('Error: No story content available for video search');
+            console.error('No story content available for video search');
+            return;
+        }
+        const lines = story.split('\n').filter(line => line.trim());
+        let currentScene = null;
+        lines.forEach(line => {
+            if (line.startsWith('Scene:')) {
+                currentScene = line.replace('Scene:', '').trim();
+            } else if (line.startsWith('Script:')) {
+                const script = line.replace('Script:', '').trim();
+                sceneData[currentScene] = sceneData[currentScene] || { script: script, video: null, audio: null };
+            }
+        });
+    }
+
+    addLog('Finding stock videos for each scene...');
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=find_videos&scene_data=${encodeURIComponent(JSON.stringify(sceneData))}&project_title=${encodeURIComponent(projectTitle)}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        Object.keys(sceneData).forEach(scene => {
+            sceneData[scene].video = data.videos[scene];
+        });
+        displayVideos();
+    })
+    .catch(error => {
+        addLog('Error finding videos: ' + error.message);
+        console.error('Error finding videos:', error);
+    });
+}
+
+function displayVideos() {
+    const container = document.getElementById('sceneVideos');
+    if (container) {
+        container.innerHTML = '';
+        Object.keys(sceneData).forEach(scene => {
+            const div = document.createElement('div');
+            div.className = 'scene-video-card';
+            const videoUrl = sceneData[scene].video ? sceneData[scene].video.url : '#';
+            const videoPath = sceneData[scene].video ? sceneData[scene].video.path : '';
+            const audioPath = sceneData[scene].audio || '';
+            div.innerHTML = `
+                <h4>${scene}</h4>
+                <p>Script: ${sceneData[scene].script}</p>
+                ${videoPath ? `<video controls src="/${videoPath}"></video>` : '<p>No video available</p>'}
+                <a href="${videoUrl}" target="_blank">View on Pexels</a>
+                ${audioPath ? `<audio controls src="/${audioPath}"></audio>` : '<p>No audio available</p>'}
+                <button onclick="reSearchVideo('${scene}')">Re-search</button>
+            `;
+            container.appendChild(div);
+        });
+        document.getElementById('videoMatchingContainer').style.display = 'block';
+        document.getElementById('generateVideoBtn').style.display = 'block';
+        addLog('Videos and VOs displayed for preview');
+    } else {
+        addLog('Error: sceneVideos container not found');
+        console.error('sceneVideos container not found');
+    }
+}
+
+function reSearchVideo(scene) {
+    addLog(`Re-searching video for scene: ${scene}`);
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=research_video&scene=${encodeURIComponent(scene)}&script=${encodeURIComponent(sceneData[scene].script)}&project_title=${encodeURIComponent(projectTitle)}&scene_data=${encodeURIComponent(JSON.stringify(sceneData))}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        sceneData[scene].video = data.video;
+        displayVideos();
+        addLog(`Re-searched video for scene: ${scene}`);
+    })
+    .catch(error => {
+        addLog('Error re-searching video: ' + error.message);
+        console.error('Error re-searching video:', error);
+    });
+}
+
+function generateVideo() {
+    const story = document.getElementById('storyOutput')?.textContent || '';
+    if (!story) {
+        addLog('Error: No story content available for video generation');
+        console.error('No story content available for video generation');
+        return;
+    }
+    const loadingAnimation = document.getElementById('loadingAnimation');
+    const generatedVideo = document.getElementById('generatedVideo');
+    const exportVideoBtn = document.getElementById('exportVideoBtn');
+    if (loadingAnimation && generatedVideo && exportVideoBtn) {
+        loadingAnimation.style.display = 'block';
+        generatedVideo.style.display = 'none';
+        exportVideoBtn.style.display = 'none';
+        addLog('Starting video generation process...');
+    } else {
+        addLog('Error: Loading animation or video elements not found');
+        console.error('Loading animation or video elements not found');
+        return;
+    }
+
+    addLog('Generating final video...');
+    fetch('/idea_to_video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=generate_video&story=${encodeURIComponent(story)}&scene_data=${encodeURIComponent(JSON.stringify(sceneData))}&project_title=${encodeURIComponent(projectTitle)}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server returned ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        loadingAnimation.style.display = 'none';
+        generatedVideo.src = `/${data.video_path}`;
+        generatedVideo.style.display = 'block';
+        exportVideoBtn.style.display = 'block';
+        addLog('Video generated successfully');
+    })
+    .catch(error => {
+        loadingAnimation.style.display = 'none';
+        addLog(`Error generating video: ${error.message}`);
+        console.error('Error generating video:', error);
+    });
+}
+
+function exportVideo() {
+    addLog('Exporting video...');
+    const videoPath = `exports/${projectTitle}.mp4`;
+    window.location.href = `/${videoPath}`; // Redirect to download the file directly
+    addLog('Video export initiated');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{
+    "story": "Title: A Day Full of Mishaps\nScene: The Breakfast Blunder\nScript: I eagerly reached for my cereal, only to realize I had grabbed the dog’s squeaky toy by mistake, which squeaked loudly as I took a bite.\nScene: The Commute Chaos\nScript: As I hurried into my car, I accidentally sat on my sunglasses, breaking them in half, and then realized I had forgotten my lunch—on the roof of the car.\nScene: The Office Oops\nScript: During an important video call, I stood up to grab a document and accidentally knocked over a cup of coffee all over my keyboard, causing the screen to turn into a colorful mess.",
+    "sceneData": {
+        "The Breakfast Blunder": {
+            "script": "I eagerly reached for my cereal, only to realize I had grabbed the dog’s squeaky toy by mistake, which squeaked loudly as I took a bite.",
+            "video": {
+                "url": "https://videos.pexels.com/video-files/32114661/13691456_3840_2160_30fps.mp4",
+                "path": "projects/A_Day_Full_of_Mishaps/videos/The_Breakfast_Blunder.mp4"
+            },
+            "audio": "projects/A_Day_Full_of_Mishaps/audio/The_Breakfast_Blunder.mp3"
+        },
+        "The Commute Chaos": {
+            "script": "As I hurried into my car, I accidentally sat on my sunglasses, breaking them in half, and then realized I had forgotten my lunch—on the roof of the car.",
+            "video": {
+                "path": "projects/A_Day_Full_of_Mishaps/videos/The_Commute_Chaos.mp4",
+                "url": "https://videos.pexels.com/video-files/4352170/4352170-hd_1080_1920_30fps.mp4"
+            },
+            "audio": "projects/A_Day_Full_of_Mishaps/audio/The_Commute_Chaos.mp3"
+        },
+        "The Office Oops": {
+            "script": "During an important video call, I stood up to grab a document and accidentally knocked over a cup of coffee all over my keyboard, causing the screen to turn into a colorful mess.",
+            "video": {
+                "path": "projects/A_Day_Full_of_Mishaps/videos/The_Office_Oops.mp4",
+                "url": "https://videos.pexels.com/video-files/7260659/7260659-hd_1080_1920_24fps.mp4"
+            },
+            "audio": "projects/A_Day_Full_of_Mishaps/audio/The_Office_Oops.mp3"
+        }
+    }
+}
