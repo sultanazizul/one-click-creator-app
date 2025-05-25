@@ -17,7 +17,7 @@ This application converts a given text or uploaded file into a video script, mat
 
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/sultanazizul/one-click-creator-app.git
 
 https://pixabay.com/api/docs/
 https://coverr.co/profile/api
