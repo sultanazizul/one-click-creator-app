@@ -1,0 +1,20 @@
+{
+    "story": "Title: The Path Within\nScene: The Call to Adventure\nScript: Ella felt lost in her routine, until a mysterious letter arrived, inviting her to explore the world beyond her comfort zone.\nScene: Stepping into the Unknown\nScript: With a trembling heart, Ella boarded a train, watching the familiar landscape fade as she embarked on her journey of self-discovery.\nScene: Finding Her Voice\nScript: In a small village, Ella met a wise old woman who taught her to listen to her inner voice and embrace her true self.",
+    "sceneData": {
+        "The Call to Adventure": {
+            "script": "Ella felt lost in her routine, until a mysterious letter arrived, inviting her to explore the world beyond her comfort zone.",
+            "video": null,
+            "audio": "projects/The_Path_Within/audio/The_Call_to_Adventure.mp3"
+        },
+        "Stepping into the Unknown": {
+            "script": "With a trembling heart, Ella boarded a train, watching the familiar landscape fade as she embarked on her journey of self-discovery.",
+            "video": null,
+            "audio": "projects/The_Path_Within/audio/Stepping_into_the_Unknown.mp3"
+        },
+        "Finding Her Voice": {
+            "script": "In a small village, Ella met a wise old woman who taught her to listen to her inner voice and embrace her true self.",
+            "video": null,
+            "audio": "projects/The_Path_Within/audio/Finding_Her_Voice.mp3"
+        }
+    }
+}

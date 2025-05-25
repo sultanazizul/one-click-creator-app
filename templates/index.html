@@ -27,20 +27,21 @@
                     <li><a href="{{ url_for('clips_generator') }}" class="{{ 'active' if active_page == 'clips_generator' else '' }}"><span>🎥</span> Clips Generator</a></li>
                     <li><a href="{{ url_for('news_content') }}" class="{{ 'active' if active_page == 'news_content' else '' }}"><span>📰</span> News Content</a></li>
                 </ul>
-            </div>            
+            </div>     
+            <div class="nav-section">
+                <h3>VIDEO TOOLS</h3>
+                <ul>
+                    <li><a href="{{ url_for('transcript') }}" class="{{ 'active' if active_page == 'transcript_download' else '' }}"><span>📖</span> AI Transcript</a></li>
+                    <li><a href="{{ url_for('subtitle_generator') }}" class="{{ 'active' if active_page == 'subtitle_generator' else '' }}"><span>📋</span> Subtitle Generator</a></li>
+                    <li><a href="{{ url_for('metadata_generator') }}" class="{{ 'active' if active_page == 'metadata_generator' else '' }}"><span>📊</span> Metadata Generator</a></li>
+                </ul>
+            </div>       
             <div class="nav-section">
                 <h3>AUDIO TOOLS</h3>
                 <ul>
                     <li><a href="{{ url_for('text_to_speech') }}" class="{{ 'active' if active_page == 'text_to_speech' else '' }}"><span>🎙️</span> Text to Speech</a></li>
                     <li><a href="{{ url_for('speech_to_text') }}" class="{{ 'active' if active_page == 'speech_to_text' else '' }}"><span>🔊</span> Speech to Text</a></li>
                     <li><a href="{{ url_for('audio_dubbing') }}" class="{{ 'active' if active_page == 'audio_dubbing' else '' }}"><span>🎙️</span> Audio Dubbing</a></li>
-                </ul>
-            </div>
-            <div class="nav-section">
-                <h3>VIDEO TOOLS</h3>
-                <ul>
-                    <li><a href="{{ url_for('subtitle_generator') }}" class="{{ 'active' if active_page == 'subtitle_generator' else '' }}"><span>📋</span> Subtitle Generator</a></li>
-                    <li><a href="{{ url_for('metadata_generator') }}" class="{{ 'active' if active_page == 'metadata_generator' else '' }}"><span>📊</span> Metadata Generator</a></li>
                 </ul>
             </div>
             <div class="nav-section">
@@ -63,7 +64,6 @@
                 <ul>
                     <li><a href="{{ url_for('video_download') }}" class="{{ 'active' if active_page == 'video_download' else '' }}"><span>📥</span> Video Download</a></li>
                     <li><a href="{{ url_for('audio_download') }}" class="{{ 'active' if active_page == 'audio_download' else '' }}"><span>🎵</span> Audio Download</a></li>
-                    <li><a href="{{ url_for('transcript') }}" class="{{ 'active' if active_page == 'transcript_download' else '' }}"><span>📝</span> Transcript Download</a></li>
                 </ul>
             </div>
             

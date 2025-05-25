@@ -6,5 +6,8 @@ python-dotenv
 sentence-transformers==2.2.2
 pexels-api==1.0.1
 gTTS==2.2.3
-openai==0.11.3
+openai>=1.0.0
 numpy<2
+whisper
+speech_recognition
+ffmpeg-python

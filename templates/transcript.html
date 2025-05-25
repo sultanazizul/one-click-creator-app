@@ -5,163 +5,343 @@
     <p>Generate transcripts from videos or audio files</p>
 </div>
 
-<div class="max-w-2xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg">
-    <!-- Input Selection -->
-    <div class="mb-6">
-        <label class="block text-gray-300 mb-2">Select Input Type</label>
-        <div class="flex space-x-4">
-            <label class="flex items-center space-x-2">
-                <input type="radio" name="inputType" value="url" class="form-radio text-blue-500" checked onclick="toggleInputType()">
-                <span class="text-gray-300">URL (Instagram/TikTok/YouTube)</span>
-            </label>
-            <label class="flex items-center space-x-2">
-                <input type="radio" name="inputType" value="file" class="form-radio text-blue-500" onclick="toggleInputType()">
-                <span class="text-gray-300">Upload File</span>
-            </label>
+<div class="form-container">
+    <form id="transcriptForm" method="POST">
+        <div class="input-group">
+            <input type="text" name="video_url" id="video_url" placeholder="Insert a Instagram video URL" required>
+            <button type="submit" name="action" value="download"><i class="fas fa-rocket"></i> Start</button>
+        </div>
+    </form>
+</div>
+
+<div id="videoOutput" style="margin-top: 20px; display: none;">
+    <div class="video-info-container">
+        <div class="video-card-small">
+            <iframe id="videoPlayer" style="width: 100%; height: 200px; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="video-info">
+            <p><strong>Title:</strong> <span id="videoTitle"></span></p>
+            <p><strong>Video by:</strong> <span id="videoUploader"></span></p>
+            <p><strong>Size:</strong> <span id="videoSize"></span></p>
+            <p><strong>Duration:</strong> <span id="videoDuration"></span></p>
         </div>
     </div>
+    <button id="transcribeBtn" style="display: none; margin-top: 10px;">Transcribe</button>
+</div>
 
-    <!-- Input Form -->
-    <div id="inputForm" class="mb-6">
-        <div id="urlInput" class="block">
-            <label for="url" class="block text-gray-300 mb-2">Video URL</label>
-            <input type="text" id="url" name="url" placeholder="Enter Instagram, TikTok, or YouTube URL" class="w-full p-3 bg-gray-800 text-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<div id="transcriptSection" style="margin-top: 20px; display: none;" class="transcript-section">
+    <div class="card transcript-card">
+        <div class="card-header">
+            <input type="checkbox" id="showTimestamps" checked> Show Timestamps
+            <button id="translateBtn">Translate</button>
+            <button id="copyTranscriptBtn">Copy</button>
         </div>
-        <div id="fileInput" class="hidden">
-            <label for="file" class="block text-gray-300 mb-2">Upload Audio/Video File</label>
-            <input type="file" id="file" name="file" accept="audio/*,video/*" class="w-full p-3 bg-gray-800 text-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+        <div id="transcriptContent"></div>
+        <div id="translatePopup" class="popup" style="display: none;">
+            <div class="popup-content">
+                <h3>Translate Settings</h3>
+                <div class="form-group">
+                    <label for="targetLang">Target Language:</label>
+                    <select id="targetLang">
+                        <option value="en">English</option>
+                        <option value="id">Indonesia</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                    </select>
+                </div>
+                <button id="confirmTranslate">Translate</button>
+                <button id="closeTranslatePopup">Close</button>
+            </div>
         </div>
     </div>
-
-    <!-- Generate Button -->
-    <button onclick="generateTranscript()" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Generate Transcript</button>
-
-    <!-- Transcript Output -->
-    <div id="transcriptContainer" class="mt-6 hidden">
-        <label class="block text-gray-300 mb-2">Transcript</label>
-        <textarea id="transcriptOutput" class="w-full p-3 bg-gray-800 text-gray-300 rounded-lg h-48 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Transcript will appear here..."></textarea>
-        <div class="flex space-x-4 mt-4">
-            <button onclick="downloadTranscript()" class="flex-1 p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Download Transcript</button>
-            <button onclick="clearTranscript()" class="flex-1 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Clear</button>
+    <div class="card ai-card">
+        <div class="card-header">
+            <select id="aiAction">
+                <option value="summary">Summary</option>
+            </select>
+            <button id="generateBtn">Generate</button>
+            <button id="copyAiBtn">Copy</button>
         </div>
-    </div>
-
-    <!-- Log Container -->
-    <div id="logContainer" class="mt-6">
-        <h3 class="text-gray-300 mb-2">Process Log</h3>
-        <pre id="logs" class="p-3 bg-gray-800 text-gray-300 rounded-lg h-24 overflow-y-auto"></pre>
+        <div id="aiContent"></div>
     </div>
 </div>
 
+<div class="log-container" id="logContainer" style="display: none;">
+    <pre id="logOutput"></pre>
+</div>
+
 <script>
-let logs = [];
+    let transcriptData = null;
+    let originalTranscript = '';
+    let originalAiContent = '';
+    let isTranslated = false;
+    let videoUrl = '';
 
-function addLog(message) {
-    logs.push(`${new Date().toLocaleTimeString()}: ${message}`);
-    document.getElementById('logs').innerHTML = logs.join('\n');
-}
-
-function toggleInputType() {
-    const inputType = document.querySelector('input[name="inputType"]:checked').value;
-    document.getElementById('urlInput').classList.toggle('hidden', inputType !== 'url');
-    document.getElementById('fileInput').classList.toggle('hidden', inputType !== 'file');
-    addLog(`Switched input type to: ${inputType}`);
-}
-
-function generateTranscript() {
-    const inputType = document.querySelector('input[name="inputType"]:checked').value;
-    const formData = new FormData();
-
-    formData.append('action', 'generate_transcript');
-    formData.append('input_type', inputType);
-
-    if (inputType === 'url') {
-        const url = document.getElementById('url').value;
-        if (!url) {
-            addLog('Error: URL is required');
-            return;
-        }
-        formData.append('url', url);
-        addLog('Generating transcript from URL...');
-    } else {
-        const fileInput = document.getElementById('file');
-        if (!fileInput.files.length) {
-            addLog('Error: No file selected');
-            return;
-        }
-        formData.append('file', fileInput.files[0]);
-        addLog('Generating transcript from uploaded file...');
+    function formatTimestamp(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    fetch('/transcript', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.error || 'Unknown error');
-            });
+    function displayTranscript(showTimestamps) {
+        let content = '<h3>Transcript Result:</h3>';
+        if (transcriptData) {
+            if (showTimestamps && transcriptData.timestamps.length) {
+                transcriptData.timestamps.forEach(ts => {
+                    const start = formatTimestamp(ts.start);
+                    const end = formatTimestamp(ts.end);
+                    content += `<p>[${start}-${end}]: ${ts.text}</p>`;
+                });
+            } else {
+                content += `<p>${transcriptData.transcript}</p>`;
+            }
+            document.getElementById('transcriptContent').innerHTML = content;
+            originalTranscript = transcriptData.transcript; // Store only the text for translation
         }
-        return response.json();
-    })
-    .then(data => {
-        document.getElementById('transcriptOutput').value = data.transcript;
-        document.getElementById('transcriptContainer').classList.remove('hidden');
-        addLog('Transcript generated successfully');
-    })
-    .catch(error => {
-        addLog(`Error generating transcript: ${error.message}`);
-        console.error('Error generating transcript:', error);
-    });
-}
-
-function downloadTranscript() {
-    const transcript = document.getElementById('transcriptOutput').value;
-    if (!transcript) {
-        addLog('Error: No transcript to download');
-        return;
     }
 
-    const formData = new FormData();
-    formData.append('action', 'download_transcript');
-    formData.append('transcript', transcript);
-
-    fetch('/transcript', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.error || 'Unknown error');
+    function displayAiContent(summary, keyPoints) {
+        let formattedSummary = '<h3>Summary:</h3>';
+        if (summary) formattedSummary += `<p>${summary}</p>`;
+        if (keyPoints && keyPoints.length) {
+            formattedSummary += '<h3>Key Points:</h3>';
+            keyPoints.forEach(point => {
+                formattedSummary += `<p>- ${point}</p>`;
             });
         }
-        return response.blob();
-    })
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'transcript.txt';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        addLog('Transcript downloaded successfully');
-    })
-    .catch(error => {
-        addLog(`Error downloading transcript: ${error.message}`);
-        console.error('Error downloading transcript:', error);
-    });
-}
+        document.getElementById('aiContent').innerHTML = formattedSummary;
+        originalAiContent = `${summary}\n${keyPoints.join('\n')}`; // Store text for display
+    }
 
-function clearTranscript() {
-    document.getElementById('transcriptOutput').value = '';
-    document.getElementById('transcriptContainer').classList.add('hidden');
-    document.getElementById('url').value = '';
-    document.getElementById('file').value = '';
-    addLog('Transcript cleared');
-}
+    function logMessage(message) {
+        const logOutput = document.getElementById('logOutput');
+        logOutput.innerHTML += `${new Date().toLocaleTimeString()}: ${message}\n`;
+        logOutput.scrollTop = logOutput.scrollHeight;
+        document.getElementById('logContainer').style.display = 'block';
+    }
+
+    document.getElementById('transcriptForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        videoUrl = document.getElementById('video_url').value;
+        const output = document.getElementById('videoOutput');
+        const transcriptSection = document.getElementById('transcriptSection');
+        output.style.display = 'none';
+        transcriptSection.style.display = 'none';
+        document.getElementById('logOutput').innerHTML = '';
+
+        logMessage('Starting process...');
+        logMessage(`Processing video from URL: ${videoUrl}`);
+
+        fetch('/transcript', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `video_url=${encodeURIComponent(videoUrl)}&action=download`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                logMessage(`Error: ${data.error}`);
+            } else if (data.metadata) {
+                logMessage('Video metadata retrieved successfully');
+                output.style.display = 'block';
+                // Use original video URL for embedding
+                let embedUrl = videoUrl;
+                if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                    embedUrl = `https://www.youtube.com/embed/${videoUrl.split('v=')[1] || videoUrl.split('/').pop()}`;
+                } else if (videoUrl.includes('instagram.com')) {
+                    embedUrl = videoUrl; // Instagram might need a different embedding method; adjust as needed
+                }
+                document.getElementById('videoPlayer').src = embedUrl;
+                document.getElementById('videoTitle').textContent = data.metadata.title;
+                document.getElementById('videoUploader').textContent = data.metadata.uploader;
+                document.getElementById('videoSize').textContent = data.metadata.size;
+                document.getElementById('videoDuration').textContent = data.metadata.duration;
+                document.getElementById('transcribeBtn').style.display = 'inline-block';
+
+                // Load existing transcript if available
+                fetch('/transcript', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `video_url=${encodeURIComponent(videoUrl)}&action=load_transcript`
+                })
+                .then(res => res.json())
+                .then(transcriptData => {
+                    if (!transcriptData.error) {
+                        transcriptData = transcriptData;
+                        displayTranscript(document.getElementById('showTimestamps').checked);
+                        transcriptSection.style.display = 'flex';
+                        isTranslated = false;
+
+                        // Load existing summary if available
+                        fetch('/transcript', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `video_url=${encodeURIComponent(videoUrl)}&action=load_summary`
+                        })
+                        .then(res => res.json())
+                        .then(summaryData => {
+                            if (!summaryData.error) {
+                                displayAiContent(summaryData.summary, summaryData.key_points);
+                            }
+                        });
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            logMessage(`Error: ${error.message}`);
+        });
+    });
+
+    document.getElementById('transcribeBtn').addEventListener('click', function() {
+        logMessage('Transcribing audio...');
+        fetch('/transcript', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `video_url=${encodeURIComponent(videoUrl)}&action=transcribe`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                logMessage(`Error: ${data.error}`);
+            } else {
+                logMessage('Transcription completed');
+                transcriptData = data;
+                displayTranscript(document.getElementById('showTimestamps').checked);
+                document.getElementById('transcriptSection').style.display = 'flex';
+                isTranslated = false;
+            }
+        })
+        .catch(error => {
+            logMessage(`Error: ${error.message}`);
+        });
+    });
+
+    document.getElementById('showTimestamps').addEventListener('change', function() {
+        if (!isTranslated) {
+            displayTranscript(this.checked);
+        } else {
+            const targetLang = document.getElementById('targetLang').value;
+            logMessage(`Re-displaying translated transcript to ${targetLang}...`);
+
+            fetch('/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `text=${encodeURIComponent(originalTranscript)}&target_lang=${targetLang}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    logMessage(`Translation error: ${data.error}`);
+                } else {
+                    logMessage('Translation re-displayed');
+                    let content = '<h3>Transcript Result:</h3>';
+                    if (this.checked && transcriptData.timestamps.length) {
+                        const translatedLines = data.translated.split('\n');
+                        transcriptData.timestamps.forEach((ts, index) => {
+                            const start = formatTimestamp(ts.start);
+                            const end = formatTimestamp(ts.end);
+                            const translatedText = translatedLines[index] || ts.text;
+                            content += `<p>[${start}-${end}]: ${translatedText}</p>`;
+                        });
+                    } else {
+                        content += `<p>${data.translated}</p>`;
+                    }
+                    document.getElementById('transcriptContent').innerHTML = content;
+                }
+            })
+            .catch(error => {
+                logMessage(`Translation error: ${error.message}`);
+            });
+        }
+    });
+
+    document.getElementById('translateBtn').addEventListener('click', function() {
+        document.getElementById('translatePopup').style.display = 'block';
+    });
+
+    document.getElementById('closeTranslatePopup').addEventListener('click', function() {
+        document.getElementById('translatePopup').style.display = 'none';
+    });
+
+    document.getElementById('confirmTranslate').addEventListener('click', function() {
+        const targetLang = document.getElementById('targetLang').value;
+        logMessage(`Translating transcript to ${targetLang}...`);
+
+        fetch('/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `text=${encodeURIComponent(originalTranscript)}&target_lang=${targetLang}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                logMessage(`Translation error: ${data.error}`);
+            } else {
+                logMessage('Translation completed');
+                let content = '<h3>Transcript Result:</h3>';
+                const showTimestamps = document.getElementById('showTimestamps').checked;
+                if (showTimestamps && transcriptData.timestamps.length) {
+                    const translatedLines = data.translated.split('\n');
+                    transcriptData.timestamps.forEach((ts, index) => {
+                        const start = formatTimestamp(ts.start);
+                        const end = formatTimestamp(ts.end);
+                        const translatedText = translatedLines[index] || ts.text;
+                        content += `<p>[${start}-${end}]: ${translatedText}</p>`;
+                    });
+                } else {
+                    content += `<p>${data.translated}</p>`;
+                }
+                document.getElementById('transcriptContent').innerHTML = content;
+                isTranslated = true;
+            }
+        })
+        .catch(error => {
+            logMessage(`Translation error: ${error.message}`);
+        });
+
+        document.getElementById('translatePopup').style.display = 'none';
+    });
+
+    document.getElementById('generateBtn').addEventListener('click', function() {
+        logMessage('Generating summary...');
+
+        fetch('/get_summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `video_url=${encodeURIComponent(videoUrl)}&transcript=${encodeURIComponent(originalTranscript)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                logMessage(`Summary error: ${data.error}`);
+                document.getElementById('aiContent').innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+            } else {
+                logMessage('Summary generated successfully');
+                displayAiContent(data.summary, data.key_points);
+            }
+        })
+        .catch(error => {
+            logMessage(`Summary error: ${error.message}`);
+            document.getElementById('aiContent').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        });
+    });
+
+    document.getElementById('copyTranscriptBtn').addEventListener('click', function() {
+        const text = document.getElementById('transcriptContent').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            logMessage('Transcript copied to clipboard');
+            alert('Transcript copied to clipboard!');
+        });
+    });
+
+    document.getElementById('copyAiBtn').addEventListener('click', function() {
+        const text = document.getElementById('aiContent').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            logMessage('AI content copied to clipboard');
+            alert('AI content copied to clipboard!');
+        });
+    });
 </script>
 {% endblock %}

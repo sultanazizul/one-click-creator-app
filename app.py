@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from app.idea_to_video.story_generator import generate_story
 from app.idea_to_video.voice_over import generate_voice_over
 from app.idea_to_video.video_matching import find_videos, re_search_video
 from app.idea_to_video.video_merging import merge_videos
+from app.video_transcript.video_transcription import transcribe_video_from_url, get_video_metadata
+from app.video_transcript.ai_assistant.ai_processor import generate_summary, translate_text
 from moviepy.config import change_settings
+from dotenv import load_dotenv
 import logging
 import json
 import os
@@ -12,11 +15,18 @@ import urllib.parse
 import requests
 import whisper
 import yt_dlp
+import hashlib
 import tempfile
+import ffmpeg
 
-# Configure ImageMagick binary path for MoviePy
-change_settings({"IMAGEMAGICK_BINARY": "/usr/local/bin/magick"})
+# Configure ImageMagick and FFmpeg paths for MoviePy
+change_settings({
+    "IMAGEMAGICK_BINARY": "/usr/local/bin/magick",
+    "FFMPEG_BINARY": "/usr/local/bin/ffmpeg"
+})
 
+# Load environment variables
+load_dotenv()
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,72 +44,26 @@ SUGGESTED_TITLES = {
     'adventure': ['Quest for the Lost Treasure', 'Surviving the Wilderness', 'The Great Expedition', 'Chasing the Unknown']
 }
 
-# Directory for temporary files and exports
-TEMP_DIR = "temp"
-EXPORTS_DIR = "exports"
+# Direktori
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMP_DIR = os.path.join(BASE_DIR, "temp")
+EXPORTS_DIR = os.path.join(BASE_DIR, "exports")
+VIDEO_DIR = os.path.join(TEMP_DIR, "videos")
+AUDIO_DIR = os.path.join(TEMP_DIR, "audio")
+PROJECT_DIR = os.path.join(BASE_DIR, "AI Transcript")
+
 os.makedirs(TEMP_DIR, exist_ok=True)
-os.makedirs(EXPORTS_DIR, exist_ok=True)
+os.makedirs(VIDEO_DIR, exist_ok=True)
+os.makedirs(AUDIO_DIR, exist_ok=True)
+os.makedirs(PROJECT_DIR, exist_ok=True)
 
 def create_project_dirs(title):
     """Create project directories for videos and audio."""
-    project_path = os.path.join('projects', title)
+    project_path = os.path.join(BASE_DIR, 'projects', title)
     os.makedirs(os.path.join(project_path, 'videos'), exist_ok=True)
     os.makedirs(os.path.join(project_path, 'audio'), exist_ok=True)
     logger.info(f"Created project directories for: {title}")
     return project_path
-
-def download_video(url, scene, project_path):
-    """Download a video from a URL and save it in the project's videos folder."""
-    try:
-        parsed_url = urllib.parse.urlparse(url)
-        if not all([parsed_url.scheme, parsed_url.netloc]):
-            raise ValueError(f"Invalid video URL: {url}")
-
-        video_filename = os.path.join(project_path, 'videos', f"{scene.replace(' ', '_')}.mp4")
-        headers = {"Authorization": f"Bearer {PEXELS_API_KEY}"}
-        response = requests.get(url, stream=True, timeout=10, headers=headers)
-        response.raise_for_status()
-
-        with open(video_filename, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-
-        logger.info(f"Downloaded video for scene {scene}: {video_filename}")
-        return video_filename
-    except Exception as e:
-        logger.error(f"Error downloading video for scene {scene} from {url}: {str(e)}")
-        raise
-
-def download_media_from_url(url):
-    """Download video/audio from a URL using yt-dlp."""
-    try:
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'outtmpl': os.path.join(TEMP_DIR, 'media.%(ext)s'),
-            'merge_output_format': 'mp4',
-            'quiet': True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        # Find the downloaded file
-        for file in os.listdir(TEMP_DIR):
-            if file.startswith("media."):
-                return os.path.join(TEMP_DIR, file)
-        raise Exception("No media file found after download")
-    except Exception as e:
-        logger.error(f"Error downloading media from {url}: {str(e)}")
-        raise
-
-def transcribe_media(file_path):
-    """Transcribe audio or video file using Whisper."""
-    try:
-        model = whisper.load_model("base")  # Use 'base' model for faster processing
-        result = model.transcribe(file_path)
-        return result["text"]
-    except Exception as e:
-        logger.error(f"Error transcribing media: {str(e)}")
-        raise
 
 @app.route('/')
 def index():
@@ -115,25 +79,25 @@ def get_suggested_titles():
 @app.route('/projects/<path:filepath>')
 def serve_project_file(filepath):
     """Serve files from the projects directory."""
-    file_path = os.path.join('projects', filepath)
+    file_path = os.path.join(BASE_DIR, 'projects', filepath)
     if os.path.exists(file_path):
-        return send_file(file_path)
+        return send_from_directory(os.path.dirname(file_path), os.path.basename(file_path))
     else:
-        return jsonify({'error': 'File not found'}), 404
+        return jsonify({'error': 'File not found'}), 404  # Corrected syntax
 
 @app.route('/exports/<path:filepath>')
 def serve_exported_file(filepath):
     """Serve files from the exports directory."""
     file_path = os.path.join(EXPORTS_DIR, filepath)
     if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True, download_name=os.path.basename(file_path))
+        return send_from_directory(EXPORTS_DIR, os.path.basename(file_path), as_attachment=True)
     else:
-        return jsonify({'error': 'File not found'}), 404
+        return jsonify({'error': 'File not found'}), 404  # Corrected syntax
 
 @app.route('/get_projects')
 def get_projects():
     """Return a list of existing project directories."""
-    projects = [d for d in os.listdir('projects') if os.path.isdir(os.path.join('projects', d))]
+    projects = [d for d in os.listdir(os.path.join(BASE_DIR, 'projects')) if os.path.isdir(os.path.join(BASE_DIR, 'projects', d))]
     logger.info(f"Retrieved projects: {projects}")
     return jsonify({'projects': projects})
 
@@ -141,7 +105,7 @@ def get_projects():
 def get_project_data():
     """Return the story and scene data for a given project."""
     project_title = request.args.get('project_title')
-    project_path = os.path.join('projects', project_title)
+    project_path = os.path.join(BASE_DIR, 'projects', project_title)
     if not os.path.exists(project_path):
         return jsonify({'error': 'Project not found'}), 404
 
@@ -157,65 +121,205 @@ def get_project_data():
     logger.info(f"Retrieved data for project {project_title}: {story}")
     return jsonify({'story': story, 'sceneData': scene_data})
 
+def generate_unique_id(video_url):
+    """Generate a unique ID based on the video URL."""
+    return hashlib.md5(video_url.encode()).hexdigest()
+
+def get_next_project_folder(title):
+    """Get the next project folder name based on existing folders."""
+    existing_folders = [d for d in os.listdir(PROJECT_DIR) if d.startswith("Project")]
+    max_num = 0
+    for folder in existing_folders:
+        try:
+            num = int(folder.split("Project ")[1].split(" -")[0])
+            max_num = max(max_num, num)
+        except (IndexError, ValueError):
+            continue
+    new_num = max_num + 1
+    sanitized_title = "".join(c for c in title if c.isalnum() or c in " -_").strip()
+    return os.path.join(PROJECT_DIR, f"Project {new_num} - {sanitized_title}")
+
+def download_video_and_audio(video_url):
+    """Download video and extract audio, return file paths and metadata."""
+    unique_id = generate_unique_id(video_url)
+    video_path = os.path.join(VIDEO_DIR, f"{unique_id}.mp4")
+    audio_path = os.path.join(AUDIO_DIR, f"{unique_id}.mp3")
+
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': video_path,
+        'quiet': True,
+    }
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            title = info.get('title', 'Unknown Title')
+        logger.info(f"Video downloaded: {video_path}")
+    except Exception as e:
+        logger.error(f"Error downloading video: {str(e)}")
+        raise
+
+    try:
+        stream = ffmpeg.input(video_path)
+        stream = ffmpeg.output(stream, audio_path, format='mp3', acodec='mp3')
+        ffmpeg.run(stream, overwrite_output=True, quiet=True)
+        logger.info(f"Audio extracted: {audio_path}")
+    except Exception as e:
+        logger.error(f"Error extracting audio: {str(e)}")
+        raise
+
+    return video_path, audio_path, title
+
 @app.route('/transcript', methods=['GET', 'POST'])
 def transcript():
     if request.method == 'POST':
+        video_url = request.form.get('video_url')
         action = request.form.get('action')
-        logger.info(f"Transcript action: {action}")
+        if not video_url:
+            return jsonify({'error': 'URL video tidak ditemukan'}), 400
 
-        if action == 'generate_transcript':
+        unique_id = generate_unique_id(video_url)
+        video_path = os.path.join(VIDEO_DIR, f"{unique_id}.mp4")
+        audio_path = os.path.join(AUDIO_DIR, f"{unique_id}.mp3")
+        project_folder = None
+
+        if action == 'download':
             try:
-                input_type = request.form.get('input_type')
-                transcript = None
-                temp_file = None
-
-                if input_type == 'url':
-                    url = request.form.get('url')
-                    if not url:
-                        return jsonify({'error': 'URL is required'}), 400
-                    logger.info(f"Downloading media from URL: {url}")
-                    temp_file = download_media_from_url(url)
-                elif input_type == 'file':
-                    if 'file' not in request.files:
-                        return jsonify({'error': 'No file uploaded'}), 400
-                    file = request.files['file']
-                    if file.filename == '':
-                        return jsonify({'error': 'No file selected'}), 400
-                    temp_file = os.path.join(TEMP_DIR, file.filename)
-                    file.save(temp_file)
-                    logger.info(f"Saved uploaded file: {temp_file}")
-                else:
-                    return jsonify({'error': 'Invalid input type'}), 400
-
-                # Transcribe the media
-                logger.info(f"Transcribing file: {temp_file}")
-                transcript = transcribe_media(temp_file)
-
-                # Clean up temporary file
-                if temp_file and os.path.exists(temp_file):
-                    os.remove(temp_file)
-                    logger.info(f"Deleted temporary file: {temp_file}")
-
-                return jsonify({'transcript': transcript})
+                # Download video and audio
+                video_path, audio_path, title = download_video_and_audio(video_url)
+                metadata = get_video_metadata(video_url, video_path)
+                return jsonify({'metadata': metadata, 'video_url': video_url})  # Return original URL instead of file path
             except Exception as e:
-                logger.error(f"Error generating transcript: {str(e)}")
-                return jsonify({'error': f"Failed to generate transcript: {str(e)}"}), 500
+                logger.error(f"Error processing video: {str(e)}")
+                return jsonify({'error': str(e)}), 500
 
-        elif action == 'download_transcript':
+        elif action == 'transcribe':
+            if not os.path.exists(audio_path):
+                return jsonify({'error': 'Audio file not found. Please download the video first.'}), 400
             try:
-                transcript = request.form.get('transcript')
-                if not transcript:
-                    return jsonify({'error': 'No transcript provided'}), 400
-                # Save transcript to a temporary file
-                temp_file = os.path.join(TEMP_DIR, 'transcript.txt')
-                with open(temp_file, 'w', encoding='utf-8') as f:
-                    f.write(transcript)
-                return send_file(temp_file, as_attachment=True, download_name='transcript.txt')
-            except Exception as e:
-                logger.error(f"Error downloading transcript: {str(e)}")
-                return jsonify({'error': f"Failed to download transcript: {str(e)}"}), 500
+                transcript_data = transcribe_video_from_url(video_url, audio_path=audio_path)
+                # Create project folder and save transcript
+                project_folder = get_next_project_folder(transcript_data.get('title', 'Unknown Title'))
+                os.makedirs(project_folder, exist_ok=True)
+                transcript_path = os.path.join(project_folder, f"transcript_{unique_id}.json")
+                transcript_json = {
+                    'video_url': video_url,
+                    'transcript': transcript_data['text'],
+                    'timestamps': transcript_data['timestamps']
+                }
+                with open(transcript_path, 'w', encoding='utf-8') as f:
+                    json.dump(transcript_json, f, ensure_ascii=False, indent=4)
+                logger.info(f"Transcript saved: {transcript_path}")
 
-    return render_template('transcript.html', active_page='transcript_download')
+                # Clean up temporary files
+                if os.path.exists(video_path):
+                    os.remove(video_path)
+                    logger.info(f"Deleted temporary video: {video_path}")
+                if os.path.exists(audio_path):
+                    os.remove(audio_path)
+                    logger.info(f"Deleted temporary audio: {audio_path}")
+
+                return jsonify({'transcript': transcript_data['text'], 'timestamps': transcript_data['timestamps']})
+            except Exception as e:
+                logger.error(f"Error transcribing video: {str(e)}")
+                return jsonify({'error': str(e)}), 500
+
+        elif action == 'load_transcript':
+            # Search for transcript in all project folders
+            for folder in os.listdir(PROJECT_DIR):
+                folder_path = os.path.join(PROJECT_DIR, folder)
+                if os.path.isdir(folder_path):
+                    transcript_path = os.path.join(folder_path, f"transcript_{unique_id}.json")
+                    if os.path.exists(transcript_path):
+                        with open(transcript_path, 'r', encoding='utf-8') as f:
+                            transcript_data = json.load(f)
+                        return jsonify({
+                            'transcript': transcript_data['transcript'],
+                            'timestamps': transcript_data['timestamps']
+                        })
+            return jsonify({'error': 'Transcript not found'}), 404
+
+        elif action == 'load_summary':
+            # Search for summary in all project folders
+            for folder in os.listdir(PROJECT_DIR):
+                folder_path = os.path.join(PROJECT_DIR, folder)
+                if os.path.isdir(folder_path):
+                    summary_path = os.path.join(folder_path, f"summary_{unique_id}.json")
+                    if os.path.exists(summary_path):
+                        with open(summary_path, 'r', encoding='utf-8') as f:
+                            summary_data = json.load(f)
+                        return jsonify({
+                            'summary': summary_data['summary'],
+                            'key_points': summary_data['key_points']
+                        })
+            return jsonify({'error': 'Summary not found'}), 404
+
+    return render_template('transcript.html', active_page='transcript')
+
+@app.route('/get_summary', methods=['POST'])
+def get_summary():
+    video_url = request.form.get('video_url')
+    transcript = request.form.get('transcript')
+    if not transcript or not video_url:
+        return jsonify({'error': 'No transcript or video URL provided'}), 400
+
+    unique_id = generate_unique_id(video_url)
+    # Search for existing project folder or create new one
+    project_folder = None
+    for folder in os.listdir(PROJECT_DIR):
+        folder_path = os.path.join(PROJECT_DIR, folder)
+        if os.path.isdir(folder_path):
+            transcript_path = os.path.join(folder_path, f"transcript_{unique_id}.json")
+            if os.path.exists(transcript_path):
+                project_folder = folder_path
+                break
+    if not project_folder:
+        project_folder = get_next_project_folder("Unknown Title")
+        os.makedirs(project_folder, exist_ok=True)
+
+    summary_path = os.path.join(project_folder, f"summary_{unique_id}.json")
+
+    try:
+        summary = generate_summary(transcript)
+        summary_lines = summary.split('\n')
+        summary_text = ''
+        key_points = []
+        in_key_points = False
+        for line in summary_lines:
+            if line.startswith('Summary:'):
+                continue
+            elif line.startswith('Key Points:'):
+                in_key_points = True
+            elif in_key_points and line.strip():
+                key_points.append(line.strip())
+            elif line.strip():
+                summary_text += (summary_text and '\n') + line.strip()
+
+        summary_data = {
+            'video_url': video_url,
+            'summary': summary_text,
+            'key_points': key_points
+        }
+        with open(summary_path, 'w', encoding='utf-8') as f:
+            json.dump(summary_data, f, ensure_ascii=False, indent=4)
+        logger.info(f"Summary saved: {summary_path}")
+        return jsonify({'summary': summary_text, 'key_points': key_points})
+    except Exception as e:
+        logger.error(f"Error generating summary: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/translate', methods=['POST'])
+def translate():
+    text = request.form.get('text')
+    target_lang = request.form.get('target_lang')
+    if not text or not target_lang:
+        return jsonify({'error': 'Text or target language missing'}), 400
+    try:
+        translated = translate_text(text, target_lang)
+        return jsonify({'translated': translated})
+    except Exception as e:
+        logger.error(f"Error translating text: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/idea_to_video', methods=['GET', 'POST'])
 def idea_to_video():
@@ -443,8 +547,6 @@ def idea_to_video():
             return jsonify({'status': 'success'})
 
     return render_template('idea_to_video.html', active_page='idea_to_video')
-
-from flask import send_from_directory  # Add this import at the top
 
 @app.route('/news_content')
 def news_content():

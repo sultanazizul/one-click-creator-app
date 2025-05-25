@@ -1,7 +1,10 @@
+/* Reset default box-sizing untuk semua elemen agar padding dan border termasuk dalam lebar dan tinggi */
 * {
     box-sizing: border-box;
 }
 
+/* Styling dasar untuk body: menggunakan font Arial, menghapus margin default, 
+   latar belakang gelap, teks terang, dan layout fleksibel dengan tinggi penuh */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -11,6 +14,8 @@ body {
     height: 100vh;
 }
 
+/* Sidebar: panel navigasi tetap di sisi kiri dengan lebar 250px, latar belakang gelap,
+   tanpa padding, tinggi penuh, posisi tetap, dan scroll vertikal jika diperlukan */
 .sidebar {
     width: 250px;
     background-color: #2c2c2c;
@@ -20,6 +25,8 @@ body {
     overflow-y: auto;
 }
 
+/* Header sidebar: penyelarasan teks ke kiri, padding, bayangan untuk efek 3D,
+   latar belakang sama dengan sidebar, posisi tetap di atas, dan z-index tinggi */
 .sidebar-header {
     text-align: left;
     padding: 15px;
@@ -32,6 +39,8 @@ body {
     margin-bottom: 20px;
 }
 
+/* Styling logo di header sidebar: ukuran 40x40px, align vertikal tengah,
+   margin kanan, dan sudut melengkung */
 .sidebar-header .logo {
     width: 40px;
     height: 40px;
@@ -40,6 +49,7 @@ body {
     border-radius: 20%;
 }
 
+/* Styling teks di samping logo: ukuran font, tebal, warna putih, align vertikal tengah */
 .sidebar-header span {
     font-size: 16px;
     font-weight: bold;
@@ -47,14 +57,18 @@ body {
     vertical-align: middle;
 }
 
+/* Navigasi utama: padding horizontal untuk konten di dalam sidebar */
 nav {
     padding: 0 10px;
 }
 
+/* Seksi navigasi: jarak bawah untuk pemisahan antar bagian */
 .nav-section {
     margin-bottom: 20px;
 }
 
+/* Judul seksi navigasi: ukuran font kecil, huruf kapital, warna abu-abu,
+   margin untuk posisi, dan spasi huruf */
 .nav-section h3 {
     font-size: 12px;
     text-transform: uppercase;
@@ -63,16 +77,20 @@ nav {
     letter-spacing: 1px;
 }
 
+/* Daftar item navigasi: tanpa bullet, tanpa padding/margin default */
 nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
+/* Item daftar navigasi: padding untuk ruang internal */
 nav ul li {
     padding: 8px 15px;
 }
 
+/* Link dalam navigasi: warna teks, tanpa dekorasi, layout fleksibel,
+   padding, dan sudut melengkung */
 nav ul li a {
     color: #e0e0e0;
     text-decoration: none;
@@ -82,17 +100,21 @@ nav ul li a {
     border-radius: 5px;
 }
 
+/* Ikon dalam link navigasi: margin kanan dan ukuran font */
 nav ul li a span {
     margin-right: 10px;
     font-size: 16px;
 }
 
+/* Styling link aktif: latar belakang semi-transparan, padding, dan warna teks putih */
 nav ul li a.active {
     background-color: #00000023;
     padding: 5px;
     color: #fff;
 }
 
+/* Konten utama: margin kiri sesuai lebar sidebar, padding, lebar penuh dikurangi sidebar,
+   tinggi penuh, dan scroll vertikal/horizontal */
 .main-content {
     margin-left: 250px;
     padding: 20px;
@@ -102,6 +124,7 @@ nav ul li a.active {
     overflow-x: hidden;
 }
 
+/* Header konten: layout fleksibel untuk spasi dan align, jarak bawah */
 .content-header {
     display: flex;
     justify-content: space-between;
@@ -109,10 +132,13 @@ nav ul li a.active {
     margin-bottom: 20px;
 }
 
+/* Judul dalam header konten: menghapus margin default */
 .content-header h1 {
     margin: 0;
 }
 
+/* Tombol untuk membuat prompt: latar belakang biru, tanpa border,
+   padding, warna teks putih, sudut melengkung, dan kursor pointer */
 .create-prompt {
     background-color: #3498db;
     border: none;
@@ -122,10 +148,13 @@ nav ul li a.active {
     cursor: pointer;
 }
 
+/* Efek hover pada tombol create-prompt: warna biru lebih gelap */
 .create-prompt:hover {
     background-color: #2980b9;
 }
 
+/* Form prompt: latar belakang gelap, padding, sudut melengkung,
+   jarak bawah, dan lebar penuh */
 .prompt-form {
     background-color: #2c2c2c;
     padding: 15px;
@@ -134,16 +163,20 @@ nav ul li a.active {
     width: 100%;
 }
 
+/* Grup form: jarak bawah antar elemen form */
 .form-group {
     margin-bottom: 10px;
 }
 
+/* Label dalam form: ditampilkan sebagai blok, jarak bawah, tebal */
 .form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
 
+/* Select dan textarea dalam form: lebar penuh, padding, border,
+   latar belakang gelap, warna teks terang, sudut melengkung, ukuran font */
 .form-group select,
 .form-group textarea {
     width: 100%;
@@ -156,11 +189,13 @@ nav ul li a.active {
     word-wrap: break-word;
 }
 
+/* Textarea spesifik: tinggi awal, resize vertikal saja */
 .form-group textarea {
     height: 80px;
     resize: vertical;
 }
 
+/* Aksi form: layout fleksibel, align tengah, jarak antar tombol, margin atas */
 .form-actions {
     display: flex;
     align-items: center;
@@ -168,6 +203,7 @@ nav ul li a.active {
     margin-top: 10px;
 }
 
+/* Grup durasi dan rasio: layout fleksibel, align tengah, jarak antar elemen */
 .duration-group,
 .ratio-group {
     display: flex;
@@ -175,17 +211,21 @@ nav ul li a.active {
     gap: 5px;
 }
 
+/* Label dalam grup durasi dan rasio: tebal */
 .duration-group label,
 .ratio-group label {
     font-weight: bold;
 }
 
+/* Select dalam grup durasi dan rasio: lebar otomatis, padding */
 .duration-group select,
 .ratio-group select {
     width: auto;
     padding: 5px;
 }
 
+/* Input durasi dan rasio: border, latar belakang, sudut melengkung,
+   ukuran font, warna teks, padding */
 .duration-group #duration,
 .ratio-group #video_ratio {
     border: 1px solid #444;
@@ -196,14 +236,19 @@ nav ul li a.active {
     padding: 8px;
 }
 
+/* Tombol batal: latar belakang abu-abu */
 .cancel-btn {
     background-color: #666;
 }
 
+/* Efek hover pada tombol batal: warna abu-abu lebih gelap */
 .cancel-btn:hover {
     background-color: #555;
 }
 
+/* Kontainer cerita: tersembunyi secara default, posisi relatif,
+   margin, padding, latar belakang, sudut melengkung, lebar penuh,
+   tinggi maksimum dengan scroll vertikal */
 .story-container {
     display: none;
     position: relative;
@@ -217,6 +262,8 @@ nav ul li a.active {
     overflow-x: hidden;
 }
 
+/* Output cerita: tanpa margin/padding default, wrap teks,
+   ukuran font, dan wrap kata */
 #storyOutput {
     margin: 0;
     padding: 0;
@@ -225,12 +272,16 @@ nav ul li a.active {
     word-wrap: break-word;
 }
 
+/* Output cerita saat edit: latar belakang lebih gelap,
+   padding, sudut melengkung */
 #storyOutput[contenteditable="true"] {
     background-color: #444;
     padding: 5px;
     border-radius: 3px;
 }
 
+/* Aksi cerita: posisi absolut di bawah kanan, layout fleksibel,
+   jarak antar tombol */
 .story-actions {
     position: absolute;
     bottom: 10px;
@@ -239,6 +290,8 @@ nav ul li a.active {
     gap: 5px;
 }
 
+/* Tombol dalam aksi cerita: padding, ukuran font, latar belakang putih,
+   warna teks gelap, border */
 .story-actions button {
     padding: 5px 10px;
     font-size: 12px;
@@ -247,10 +300,13 @@ nav ul li a.active {
     border: 1px solid #444;
 }
 
+/* Efek hover pada tombol aksi cerita: latar belakang lebih terang */
 .story-actions button:hover {
     background-color: #e0e0e0;
 }
 
+/* Kontainer pencocokan video: margin, padding, latar belakang,
+   sudut melengkung, lebar penuh, tersembunyi secara default */
 .video-matching-container {
     margin: 15px 0;
     padding: 15px;
@@ -260,6 +316,8 @@ nav ul li a.active {
     display: none;
 }
 
+/* Grid video adegan: layout grid dengan 3 kolom, jarak antar item,
+   margin atas */
 .scene-videos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -267,6 +325,8 @@ nav ul li a.active {
     margin-top: 15px;
 }
 
+/* Kartu video adegan: padding, latar belakang, sudut melengkung,
+   layout kolom dengan jarak antar elemen */
 .scene-video-card {
     padding: 10px;
     background-color: #2c2c2c;
@@ -276,16 +336,20 @@ nav ul li a.active {
     gap: 5px;
 }
 
+/* Judul dalam kartu video: tanpa margin default, ukuran font */
 .scene-video-card h4 {
     margin: 0 0 5px 0;
     font-size: 14px;
 }
 
+/* Paragraf dalam kartu video: tanpa margin default, ukuran font */
 .scene-video-card p {
     margin: 0;
     font-size: 12px;
 }
 
+/* Video dalam kartu: lebar penuh, tinggi tetap, proporsi gambar terjaga,
+   sudut melengkung */
 .scene-video-card video {
     width: 100%;
     height: 150px;
@@ -293,32 +357,39 @@ nav ul li a.active {
     border-radius: 5px;
 }
 
+/* Audio dalam kartu: lebar penuh, margin vertikal */
 .scene-video-card audio {
     width: 100%;
     margin: 5px 0;
 }
 
+/* Link dalam kartu: warna biru, tanpa dekorasi, ukuran font */
 .scene-video-card a {
     color: #3498db;
     text-decoration: none;
     font-size: 12px;
 }
 
+/* Efek hover pada link: warna biru lebih gelap */
 .scene-video-card a:hover {
     color: #2980b9;
 }
 
+/* Tombol dalam kartu: padding, ukuran font */
 .scene-video-card button {
     padding: 5px;
     font-size: 12px;
 }
 
+/* Kontainer hasil video: margin, lebar penuh, posisi relatif */
 .video-result {
     margin: 15px 0;
     width: 100%;
     position: relative;
 }
 
+/* Animasi loading: layout tengah, tinggi tetap, latar belakang,
+   sudut melengkung */
 #loadingAnimation {
     display: flex;
     flex-direction: column;
@@ -329,6 +400,8 @@ nav ul li a.active {
     border-radius: 5px;
 }
 
+/* Spinner loading: border untuk animasi, sudut melengkung,
+   ukuran, animasi putar */
 .spinner {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #3498db;
@@ -339,16 +412,20 @@ nav ul li a.active {
     margin-bottom: 10px;
 }
 
+/* Definisi animasi putar untuk spinner */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+/* Video yang dihasilkan: lebar penuh, sudut melengkung */
 #generatedVideo {
     width: 100%;
     border-radius: 5px;
 }
 
+/* Tombol ekspor video: padding, latar belakang biru, warna teks,
+   tanpa border, sudut melengkung, kursor pointer, margin atas */
 #exportVideoBtn {
     padding: 10px 20px;
     background-color: #3498db;
@@ -359,10 +436,13 @@ nav ul li a.active {
     margin-top: 10px;
 }
 
+/* Efek hover pada tombol ekspor: warna biru lebih gelap */
 #exportVideoBtn:hover {
     background-color: #2980b9;
 }
 
+/* Kontainer log: margin atas, padding, latar belakang, sudut melengkung,
+   lebar penuh */
 .log-container {
     margin-top: 20px;
     padding: 15px;
@@ -371,6 +451,8 @@ nav ul li a.active {
     width: 100%;
 }
 
+/* Output log: tanpa margin/padding default, ukuran font,
+   tinggi maksimum dengan scroll vertikal, wrap kata */
 .log-container pre {
     margin: 0;
     font-size: 12px;
@@ -380,6 +462,8 @@ nav ul li a.active {
     word-wrap: break-word;
 }
 
+/* Styling default untuk semua tombol: padding, latar belakang biru,
+   warna teks putih, tanpa border, sudut melengkung, kursor pointer */
 button {
     padding: 10px 20px;
     background-color: #3498db;
@@ -389,13 +473,222 @@ button {
     cursor: pointer;
 }
 
+/* Efek hover default untuk tombol: warna biru lebih gelap */
 button:hover {
     background-color: #2980b9;
 }
 
+/* Styling default untuk elemen pre: latar belakang gelap,
+   padding, sudut melengkung, wrap teks */
 pre {
     background-color: #333;
     padding: 10px;
     border-radius: 5px;
     white-space: pre-wrap;
+}
+
+/* Header konten alternatif: penyelarasan tengah, jarak bawah */
+.content-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Kontainer form: penyelarasan tengah, jarak bawah */
+.form-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Grup form alternatif: jarak bawah */
+.form-group {
+    margin-bottom: 10px;
+}
+
+/* Label dalam grup form alternatif: margin kanan */
+.form-group label {
+    margin-right: 10px;
+}
+
+/* Input dalam grup form alternatif: padding, lebar tetap */
+.form-group input {
+    padding: 5px;
+    width: 300px;
+}
+
+/* Styling default untuk tombol alternatif: padding, latar belakang biru,
+   warna teks putih, tanpa border, kursor pointer */
+button {
+    padding: 10px 20px;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Efek hover untuk tombol alternatif: warna biru lebih gelap */
+button:hover {
+    background-color: #104e8b;
+}
+
+/* Grup input: layout fleksibel, align tengah, lebar hampir penuh,
+   batas maksimum, border, sudut melengkung, overflow hidden */
+.input-group {
+    display: flex;
+    align-items: center;
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 2px solid #1e90ff;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Input dalam grup: fleksibel, padding, ukuran font, tanpa border,
+   outline none, latar belakang putih, warna teks gelap */
+.input-group input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Placeholder input: warna abu-abu */
+.input-group input::placeholder {
+    color: #888;
+}
+
+/* Tombol dalam grup: padding, ukuran font, latar belakang biru,
+   warna teks putih, tanpa border, kursor pointer, layout fleksibel */
+.input-group button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Efek hover pada tombol grup: warna biru lebih gelap */
+.input-group button:hover {
+    background-color: #104e8b;
+}
+
+/* Ikon dalam tombol grup: margin kanan */
+.input-group button i {
+    margin-right: 5px;
+}
+
+/* Kontainer info video: layout fleksibel, align atas,
+   latar belakang, padding, sudut melengkung, jarak bawah */
+.video-info-container {
+    display: flex;
+    align-items: flex-start;
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Kartu video kecil: lebar tetap, margin kanan */
+.video-card-small {
+    width: 300px;
+    margin-right: 20px;
+}
+
+/* Info video: fleksibel untuk mengisi ruang */
+.video-info {
+    flex: 1;
+}
+
+/* Paragraf dalam info video: jarak vertikal */
+.video-info p {
+    margin: 5px 0;
+}
+
+/* Seksi transkrip: layout fleksibel, spasi antar kartu */
+.transcript-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Kartu umum: lebar 48%, latar belakang, padding,
+   sudut melengkung, posisi relatif */
+.card {
+    width: 48%;
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+}
+
+/* Header kartu: layout fleksibel, spasi antar elemen,
+   jarak bawah */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+/* Konten transkrip dan AI: tinggi maksimum, scroll vertikal */
+#transcriptContent, #aiContent {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Popup: posisi absolut, jarak atas/kanan, latar belakang,
+   sudut melengkung, bayangan, z-index tinggi, lebar tetap */
+.popup {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    width: 200px;
+}
+
+/* Konten popup: padding, penyelarasan tengah */
+.popup-content {
+    padding: 15px;
+    text-align: center;
+}
+
+/* Judul dalam popup: tanpa margin atas, ukuran font */
+.popup-content h3 {
+    margin-top: 0;
+    font-size: 14px;
+}
+
+/* Tombol dalam popup: margin, padding, ukuran font */
+.popup-content button {
+    margin: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+/* Kontainer log: margin atas, padding, latar belakang,
+   sudut melengkung, lebar penuh */
+.log-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #333;
+    border-radius: 5px;
+    width: 100%;
+}
+
+/* Output log: tanpa margin/padding default, ukuran font,
+   tinggi maksimum dengan scroll vertikal, wrap kata */
+.log-container pre {
+    margin: 0;
+    font-size: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
 }
