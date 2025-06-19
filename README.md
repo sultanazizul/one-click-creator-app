@@ -21,6 +21,3 @@ This application converts a given text or uploaded file into a video script, mat
 
 https://pixabay.com/api/docs/
 https://coverr.co/profile/api
-
-
-sementara init.py

@@ -140,7 +140,7 @@ def get_next_project_folder(title):
     return os.path.join(PROJECT_DIR, f"Project {new_num} - {sanitized_title}")
 
 def download_video_and_audio(video_url):
-    """Download video and extract audio, return file paths and metadata."""
+    logger.info(f"Starting download for URL: {video_url}")
     unique_id = generate_unique_id(video_url)
     video_path = os.path.join(VIDEO_DIR, f"{unique_id}.mp4")
     audio_path = os.path.join(AUDIO_DIR, f"{unique_id}.mp3")
@@ -148,7 +148,9 @@ def download_video_and_audio(video_url):
     ydl_opts = {
         'format': 'best',
         'outtmpl': video_path,
-        'quiet': True,
+        'quiet': False,
+        'verbose': True,  # Enable verbose logging for debugging
+        'nocheckcertificate': True  # Temporary workaround for SSL issue
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -156,7 +158,7 @@ def download_video_and_audio(video_url):
             title = info.get('title', 'Unknown Title')
         logger.info(f"Video downloaded: {video_path}")
     except Exception as e:
-        logger.error(f"Error downloading video: {str(e)}")
+        logger.error(f"Error downloading video from {video_url}: {str(e)}", exc_info=True)
         raise
 
     try:
