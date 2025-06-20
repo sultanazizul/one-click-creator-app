@@ -1,0 +1,21 @@
+{
+    "story": "Title: The Sunrise Whisper\nScene: Awakening\nScript: The alarm chirped softly, a gentle nudge from the universe to begin again. Outside, the first hint of dawn painted the sky with muted hues of rose and gold.\nScene: The First Breath\nScript: Sarah stretched, feeling the quiet promise of a new day filling her lungs. Today, she knew, held its own unique magic, waiting to be discovered with every sunrise.",
+    "sceneData": {
+        "Awakening": {
+            "script": "The alarm chirped softly, a gentle nudge from the universe to begin again. Outside, the first hint of dawn painted the sky with muted hues of rose and gold.",
+            "video": {
+                "url": "https://videos.pexels.com/video-files/3580077/3580077-hd_1920_1080_25fps.mp4",
+                "path": "/Users/sultanazizul/Documents/CODE/PYTHON/coba/tksi/one-click-creator/projects/The_Sunrise_Whisper/videos/Awakening.mp4"
+            },
+            "audio": "projects/The_Sunrise_Whisper/audio/Awakening.mp3"
+        },
+        "The First Breath": {
+            "script": "Sarah stretched, feeling the quiet promise of a new day filling her lungs. Today, she knew, held its own unique magic, waiting to be discovered with every sunrise.",
+            "video": {
+                "url": "https://videos.pexels.com/video-files/5124236/5124236-hd_1920_1080_25fps.mp4",
+                "path": "/Users/sultanazizul/Documents/CODE/PYTHON/coba/tksi/one-click-creator/projects/The_Sunrise_Whisper/videos/The First Breath.mp4"
+            },
+            "audio": "projects/The_Sunrise_Whisper/audio/The_First_Breath.mp3"
+        }
+    }
+}

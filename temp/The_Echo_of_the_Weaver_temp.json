@@ -1,0 +1,20 @@
+{
+    "title": "The Echo of the Weaver",
+    "sceneData": {
+        "The Dusty Attic": {
+            "script": "Elara stumbled upon an old, intricately woven tapestry hidden beneath a moth-eaten blanket in her grandmother's attic. It depicted a scene of vibrant market life, but with a curious, almost invisible figure woven into the background.",
+            "video": null,
+            "audio": null
+        },
+        "The Faded Journal": {
+            "script": "Tucked within the tapestry's folds was a brittle journal, its pages filled with faded ink. The journal spoke of Anya, a brilliant weaver who used her art to secretly record the whispers of rebellion during a time of strict censorship.",
+            "video": null,
+            "audio": null
+        },
+        "The Unveiling": {
+            "script": "Elara realized the tapestry wasn't just art; it was a coded message, the \"hidden figure\" Anya's way of marking her defiance, a silent protest woven into the fabric of history.",
+            "video": null,
+            "audio": null
+        }
+    }
+}

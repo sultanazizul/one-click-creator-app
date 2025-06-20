@@ -1,0 +1,20 @@
+{
+    "story": "Title: The Weaver's Whisper\nScene: The Dusty Attic\nScript: Elara stumbled upon an old wooden chest in her grandmother's attic, filled with faded tapestries. As she touched a intricately woven scene, a faint shimmer emanated from the threads.\nScene: Echoes of the Past\nScript: The tapestry seemed to whisper tales of a forgotten female artisan who used her craft to communicate messages of resistance during a time of oppression. Elara realized history held more than just kings and battles.\nScene: A New Thread\nScript: Inspired, Elara decided to learn the art of weaving, determined to uncover and share other hidden stories of the past. She felt a connection to this silent storyteller from centuries ago.",
+    "sceneData": {
+        "The Dusty Attic": {
+            "script": "Elara stumbled upon an old wooden chest in her grandmother's attic, filled with faded tapestries. As she touched a intricately woven scene, a faint shimmer emanated from the threads.",
+            "video": null,
+            "audio": null
+        },
+        "Echoes of the Past": {
+            "script": "The tapestry seemed to whisper tales of a forgotten female artisan who used her craft to communicate messages of resistance during a time of oppression. Elara realized history held more than just kings and battles.",
+            "video": null,
+            "audio": null
+        },
+        "A New Thread": {
+            "script": "Inspired, Elara decided to learn the art of weaving, determined to uncover and share other hidden stories of the past. She felt a connection to this silent storyteller from centuries ago.",
+            "video": null,
+            "audio": null
+        }
+    }
+}

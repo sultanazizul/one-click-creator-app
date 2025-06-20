@@ -1,0 +1,37 @@
+{
+    "story": "Title: The Whispering Atlas\nScene: The Dusty Attic\nScript: Elara stumbled upon an ancient, leather-bound atlas, its pages filled with faded ink and unknown lands. A strange pull drew her in, promising adventures far beyond her quiet life.\nScene: The First Landmark\nScript: Following a whisper of wind from the atlas's pages, Elara found herself at the foot of a colossal, forgotten monument. This was the first step on a path that would lead her to understand not just the world, but herself.\nScene: The Inner Compass\nScript: As Elara navigated the unfamiliar terrain of her heart, guided by the atlas's cryptic clues, she realized the greatest discoveries were not external, but the strengths and passions she unearthed within.",
+    "sceneData": {
+        "The Dusty Attic": {
+            "script": "Elara stumbled upon an ancient, leather-bound atlas, its pages filled with faded ink and unknown lands. A strange pull drew her in, promising adventures far beyond her quiet life.",
+            "video": null,
+            "audio": null
+        },
+        "The First Landmark": {
+            "script": "Following a whisper of wind from the atlas's pages, Elara found herself at the foot of a colossal, forgotten monument. This was the first step on a path that would lead her to understand not just the world, but herself.",
+            "video": null,
+            "audio": null
+        },
+        "The Inner Compass": {
+            "script": "As Elara navigated the unfamiliar terrain of her heart, guided by the atlas's cryptic clues, she realized the greatest discoveries were not external, but the strengths and passions she unearthed within.",
+            "video": null,
+            "audio": null
+        }
+    },
+    "parsedStory": {
+        "title": "The Whispering Atlas",
+        "scenes": [
+            {
+                "scene_title": "The Dusty Attic",
+                "script": "Elara stumbled upon an ancient, leather-bound atlas, its pages filled with faded ink and unknown lands. A strange pull drew her in, promising adventures far beyond her quiet life."
+            },
+            {
+                "scene_title": "The First Landmark",
+                "script": "Following a whisper of wind from the atlas's pages, Elara found herself at the foot of a colossal, forgotten monument. This was the first step on a path that would lead her to understand not just the world, but herself."
+            },
+            {
+                "scene_title": "The Inner Compass",
+                "script": "As Elara navigated the unfamiliar terrain of her heart, guided by the atlas's cryptic clues, she realized the greatest discoveries were not external, but the strengths and passions she unearthed within."
+            }
+        ]
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "story": "Title: Anya's Canvas\nScene: The Blank Page\nScript: Anya stared at the pristine white canvas, a mix of excitement and trepidation swirling within her. She had always wanted to paint, but her early attempts felt clumsy and uninspired.\nScene: The First Stroke\nScript: With a deep breath, Anya dipped her brush into vibrant blue and made the first hesitant stroke across the canvas, a new journey of learning beginning.\nScene: The Blossoming\nScript: Days turned into weeks, and Anya's room filled with canvases, each one a testament to her growing skill and dedication to mastering her art.",
+    "sceneData": {
+        "The Blank Page": {
+            "script": "Anya stared at the pristine white canvas, a mix of excitement and trepidation swirling within her. She had always wanted to paint, but her early attempts felt clumsy and uninspired.",
+            "video": null,
+            "audio": null
+        },
+        "The First Stroke": {
+            "script": "With a deep breath, Anya dipped her brush into vibrant blue and made the first hesitant stroke across the canvas, a new journey of learning beginning.",
+            "video": null,
+            "audio": null
+        },
+        "The Blossoming": {
+            "script": "Days turned into weeks, and Anya's room filled with canvases, each one a testament to her growing skill and dedication to mastering her art.",
+            "video": null,
+            "audio": null
+        }
+    }
+}

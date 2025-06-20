@@ -1,0 +1,37 @@
+{
+    "story": "Title: The Whispering Map of forgotten paths\nScene: The Dusty Attic\nScript: Elara stumbled upon an old, leather-bound map tucked away in her grandmother’s attic, its lines faded but strangely alluring. It spoke of a hidden village, lost to time and memory, a place whispered about only in forgotten folklore.\nScene: The Forest's Embrace\nScript: Following the map’s cryptic clues, Elara ventured into an ancient forest, the trees closing in like a protective embrace. She discovered a faint, overgrown path, a secret entrance leading to a place no one had seen for centuries.\nScene: Echoes of the Past\nScript: The village, nestled in a sun-dappled clearing, was a silent testament to a forgotten way of life, its stones humming with the echoes of its former inhabitants. Elara realized history wasn't just in books; it was in the whispers of the wind and the stories etched in the earth.",
+    "sceneData": {
+        "The Dusty Attic": {
+            "script": "Elara stumbled upon an old, leather-bound map tucked away in her grandmother’s attic, its lines faded but strangely alluring. It spoke of a hidden village, lost to time and memory, a place whispered about only in forgotten folklore.",
+            "video": null,
+            "audio": null
+        },
+        "The Forest's Embrace": {
+            "script": "Following the map’s cryptic clues, Elara ventured into an ancient forest, the trees closing in like a protective embrace. She discovered a faint, overgrown path, a secret entrance leading to a place no one had seen for centuries.",
+            "video": null,
+            "audio": null
+        },
+        "Echoes of the Past": {
+            "script": "The village, nestled in a sun-dappled clearing, was a silent testament to a forgotten way of life, its stones humming with the echoes of its former inhabitants. Elara realized history wasn't just in books; it was in the whispers of the wind and the stories etched in the earth.",
+            "video": null,
+            "audio": null
+        }
+    },
+    "parsedStory": {
+        "title": "The Whispering Map of forgotten paths",
+        "scenes": [
+            {
+                "scene_title": "The Dusty Attic",
+                "script": "Elara stumbled upon an old, leather-bound map tucked away in her grandmother’s attic, its lines faded but strangely alluring. It spoke of a hidden village, lost to time and memory, a place whispered about only in forgotten folklore."
+            },
+            {
+                "scene_title": "The Forest's Embrace",
+                "script": "Following the map’s cryptic clues, Elara ventured into an ancient forest, the trees closing in like a protective embrace. She discovered a faint, overgrown path, a secret entrance leading to a place no one had seen for centuries."
+            },
+            {
+                "scene_title": "Echoes of the Past",
+                "script": "The village, nestled in a sun-dappled clearing, was a silent testament to a forgotten way of life, its stones humming with the echoes of its former inhabitants. Elara realized history wasn't just in books; it was in the whispers of the wind and the stories etched in the earth."
+            }
+        ]
+    }
+}

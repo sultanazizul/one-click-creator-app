@@ -1,0 +1,29 @@
+{
+    "story": "Title: The Mystery of the Melting Ice Cream\nScene: The Picnic Surprise\nScript: Lily and Tom sat on a checkered blanket, a colorful picnic basket between them. As Mom unwrapped a creamy vanilla ice cream cone for Lily, the sun beat down, and a tiny droplet of melted ice cream began to fall.\nScene: The Vanishing Act\nScript: Tom watched, fascinated, as his own chocolate cone quickly transformed from solid to liquid, disappearing into a sticky puddle on the wrapper. Lily giggled as her cone seemed to shrink before her eyes, the creamy white becoming a sweet, flowing river.\nScene: The Cool Explanation\nScript: Dad chuckled, explaining how the sun's warmth, or thermal energy, caused the ice cream's molecules to move faster, breaking their solid bonds and turning it into a delicious, albeit messy, liquid. The science of everyday life was truly fascinating, even when it involved a sweet treat.",
+    "sceneData": {
+        "The Picnic Surprise": {
+            "script": "Lily and Tom sat on a checkered blanket, a colorful picnic basket between them. As Mom unwrapped a creamy vanilla ice cream cone for Lily, the sun beat down, and a tiny droplet of melted ice cream began to fall.",
+            "video": {
+                "path": "projects/The_Mystery_of_the_Melting_Ice_Cream/videos/The Picnic Surprise.mp4",
+                "url": "https://videos.pexels.com/video-files/6632890/6632890-hd_1080_1920_25fps.mp4"
+            },
+            "audio": "projects/The_Mystery_of_the_Melting_Ice_Cream/audio/The_Picnic_Surprise.mp3"
+        },
+        "The Vanishing Act": {
+            "script": "Tom watched, fascinated, as his own chocolate cone quickly transformed from solid to liquid, disappearing into a sticky puddle on the wrapper. Lily giggled as her cone seemed to shrink before her eyes, the creamy white becoming a sweet, flowing river.",
+            "video": {
+                "url": "https://videos.pexels.com/video-files/856136/856136-hd_1920_1080_25fps.mp4",
+                "path": "projects/The_Mystery_of_the_Melting_Ice_Cream/videos/The Vanishing Act.mp4"
+            },
+            "audio": "projects/The_Mystery_of_the_Melting_Ice_Cream/audio/The_Vanishing_Act.mp3"
+        },
+        "The Cool Explanation": {
+            "script": "Dad chuckled, explaining how the sun's warmth, or thermal energy, caused the ice cream's molecules to move faster, breaking their solid bonds and turning it into a delicious, albeit messy, liquid. The science of everyday life was truly fascinating, even when it involved a sweet treat.",
+            "video": {
+                "path": "projects/The_Mystery_of_the_Melting_Ice_Cream/videos/The Cool Explanation.mp4",
+                "url": "https://videos.pexels.com/video-files/7123919/7123919-hd_2048_1080_30fps.mp4"
+            },
+            "audio": "projects/The_Mystery_of_the_Melting_Ice_Cream/audio/The_Cool_Explanation.mp3"
+        }
+    }
+}

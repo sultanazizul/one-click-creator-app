@@ -1,0 +1,20 @@
+{
+    "story": "Title: The Whispering Woods\nScene: The Forest's Edge\nScript: Elara stood at the edge of the ancient woods, a map clutched in her hand and a knot of uncertainty in her stomach. The path ahead was barely visible, swallowed by shadows and the promise of the unknown.\nScene: The Crossroads\nScript: Deeper within, the trees grew taller, their branches intertwining like a protective canopy, and Elara found herself at a fork in the path, each direction whispering a different possibility. She paused, listening to her own heart, a quiet compass amidst the rustling leaves.\nScene: The Clearing\nScript: Emerging into a sun-drenched clearing, Elara saw not a destination, but a reflection of herself in the still waters of a hidden spring. She finally understood the journey wasn't about finding a place, but about finding her own voice within the quiet of the world.",
+    "sceneData": {
+        "The Forest's Edge": {
+            "script": "Elara stood at the edge of the ancient woods, a map clutched in her hand and a knot of uncertainty in her stomach. The path ahead was barely visible, swallowed by shadows and the promise of the unknown.",
+            "video": null,
+            "audio": null
+        },
+        "The Crossroads": {
+            "script": "Deeper within, the trees grew taller, their branches intertwining like a protective canopy, and Elara found herself at a fork in the path, each direction whispering a different possibility. She paused, listening to her own heart, a quiet compass amidst the rustling leaves.",
+            "video": null,
+            "audio": null
+        },
+        "The Clearing": {
+            "script": "Emerging into a sun-drenched clearing, Elara saw not a destination, but a reflection of herself in the still waters of a hidden spring. She finally understood the journey wasn't about finding a place, but about finding her own voice within the quiet of the world.",
+            "video": null,
+            "audio": null
+        }
+    }
+}

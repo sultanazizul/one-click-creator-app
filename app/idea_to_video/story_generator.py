@@ -1,13 +1,19 @@
-import openai
+import google.generativeai as genai
 import logging
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 logger = logging.getLogger(__name__)
 
-openai.api_key = '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'
+# Configure Gemini API dengan kunci API langsung
+# PERINGATAN: Menyematkan kunci API langsung dalam kode TIDAK disarankan untuk produksi.
+# Gunakan variabel lingkungan atau layanan manajemen kunci yang aman untuk produksi.
+genai.configure(api_key="AIzaSyCJta-o3NHq2FOKJm2F92TcRrlrUqea0Lc")
 
 def generate_story(idea, theme, duration):
     logger.info(f"Generating story with idea: {idea}, theme: {theme}, duration: {duration}")
-    
+
     # Map duration to number of scenes
     duration_map = {
         'short': (2, 3),
@@ -15,7 +21,7 @@ def generate_story(idea, theme, duration):
         'long': (6, 8)
     }
     min_scenes, max_scenes = duration_map.get(duration, (2, 3))
-    
+
     # Create a clear and strict prompt
     prompt = f"""
     You are a creative writer tasked with writing a {theme} story based on the idea: "{idea}".
@@ -38,35 +44,32 @@ def generate_story(idea, theme, duration):
     Scene: The First Kick
     Script: We started playing, and I was amazed by Neymar's skill as he effortlessly dribbled past me.
     """
-    
+
     try:
-        response = openai.Completion.create(
-            engine="gpt-4.1-nano",  # Use the configured engine
-            prompt=prompt,
-            max_tokens=1000,
-            temperature=0.7
-        )
-        
-        story_text = response.choices[0].text.strip()
+        # Mengganti model ke gemini-2.5-flash-lite-preview-06-17
+        model = genai.GenerativeModel('gemini-2.5-flash-lite-preview-06-17')
+        response = model.generate_content(prompt)
+
+        story_text = response.text.strip()
         logger.info(f"Raw API response: {story_text}")
-        
+
         # Split into lines and filter to keep only valid story lines
         lines = [line.strip() for line in story_text.split('\n') if line.strip()]
         cleaned_lines = []
         capturing = False
-        
+
         for line in lines:
             if line.startswith("Title:"):
                 capturing = True
             if capturing and (line.startswith("Title:") or line.startswith("Scene:") or line.startswith("Script:")):
                 cleaned_lines.append(line)
-        
+
         cleaned_story = '\n'.join(cleaned_lines)
-        
+
         if not cleaned_story:
             logger.warning("Valid story content not found, using fallback")
             return f"Title: [Story Title]\nScene: [Scene Title]\nScript: [Scene Script]\nScene: [Scene Title]\nScript: [Scene Script]"
-        
+
         logger.info(f"Cleaned story: {cleaned_story}")
         return cleaned_story
     except Exception as e:

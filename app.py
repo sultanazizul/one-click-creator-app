@@ -22,7 +22,7 @@ import ffmpeg
 # Configure ImageMagick and FFmpeg paths for MoviePy
 change_settings({
     "IMAGEMAGICK_BINARY": "/usr/local/bin/magick",
-    "FFMPEG_BINARY": "/usr/local/bin/ffmpeg"
+    "FFMAGIC_BINARY": "/usr/local/bin/ffmpeg"
 })
 
 # Load environment variables
@@ -64,6 +64,30 @@ def create_project_dirs(title):
     os.makedirs(os.path.join(project_path, 'audio'), exist_ok=True)
     logger.info(f"Created project directories for: {title}")
     return project_path
+
+# Fungsi baru untuk mengunduh video dari Pexels
+def download_video(video_url, scene_name, project_path):
+    """Downloads a video from a given URL to the project's video directory."""
+    try:
+        response = requests.get(video_url, stream=True)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
+
+        # Sanitize scene_name to create a valid filename
+        sanitized_scene_name = "".join(c for c in scene_name if c.isalnum() or c in " -_").strip()
+        video_filename = f"{sanitized_scene_name}.mp4"
+        video_filepath = os.path.join(project_path, 'videos', video_filename)
+
+        with open(video_filepath, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        logger.info(f"Downloaded video for scene '{scene_name}' to: {video_filepath}")
+        return video_filepath
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error downloading video from {video_url} for scene {scene_name}: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"An unexpected error occurred during video download for scene {scene_name}: {e}")
+        raise
 
 @app.route('/')
 def index():
@@ -441,11 +465,12 @@ def idea_to_video():
             try:
                 scene_data = json.loads(scene_data)
                 videos = {}
-                project_path = os.path.join('projects', project_title)
+                project_path = create_project_dirs(project_title) # Ensure project directories exist
                 for scene, data in scene_data.items():
                     summary = f"{data['script'][:50]}..."
                     keywords = data['script'].split()[:3]
                     video_url = find_videos(summary, keywords)
+                    # Memanggil fungsi download_video yang baru ditambahkan
                     video_path = download_video(video_url, scene, project_path)
                     videos[scene] = {'url': video_url, 'path': video_path}
                     data['video'] = videos[scene]
@@ -471,6 +496,7 @@ def idea_to_video():
                     os.remove(old_video_path)
                     logger.info(f"Deleted old video for scene {scene}: {old_video_path}")
                 video_url = re_search_video(summary, keywords)
+                # Memanggil fungsi download_video yang baru ditambahkan
                 video_path = download_video(video_url, scene, project_path)
                 logger.info(f"Re-searched video for scene {scene}: {video_url}")
                 scene_data = json.loads(request.form.get('scene_data', '{}'))

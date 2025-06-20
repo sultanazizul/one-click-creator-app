@@ -1,0 +1,15 @@
+{
+    "story": "Title: The Magic of a Morning Brew\nScene: Kitchen Awakening\nScript: Sunlight streamed into Leo's kitchen as he reached for the coffee maker, the promise of a warm, caffeinated start to his day. He measured the grounds, inhaling their rich aroma, a familiar science unfolding with each scoop.\nScene: The Steaming Cup\nScript: As the water heated and brewed, Leo watched the dark liquid fill his mug, a complex chemical reaction transforming simple beans into liquid energy. Holding the warm ceramic, he took his first sip, a perfect balance of heat and flavor, a testament to the science of a perfect brew.",
+    "sceneData": {
+        "Kitchen Awakening": {
+            "script": "Sunlight streamed into Leo's kitchen as he reached for the coffee maker, the promise of a warm, caffeinated start to his day. He measured the grounds, inhaling their rich aroma, a familiar science unfolding with each scoop.",
+            "video": null,
+            "audio": null
+        },
+        "The Steaming Cup": {
+            "script": "As the water heated and brewed, Leo watched the dark liquid fill his mug, a complex chemical reaction transforming simple beans into liquid energy. Holding the warm ceramic, he took his first sip, a perfect balance of heat and flavor, a testament to the science of a perfect brew.",
+            "video": null,
+            "audio": null
+        }
+    }
+}

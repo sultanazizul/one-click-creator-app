@@ -1,12 +1,15 @@
 import os
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Configure Gemini API dengan kunci API langsung
+# PERINGATAN: Menyematkan kunci API langsung dalam kode TIDAK disarankan untuk produksi.
+# Gunakan variabel lingkungan atau layanan manajemen kunci yang aman untuk produksi.
+genai.configure(api_key="AIzaSyCJta-o3NHq2FOKJm2F92TcRrlrUqea0Lc")
 
 def generate_summary(transcript):
     try:
@@ -22,12 +25,10 @@ def generate_summary(transcript):
         - (timestamp): [Key point text here]
         - (timestamp): [Key point text here]"
         """
-        response = client.chat.completions.create(
-            model="gpt-4.1-nano",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=500
-        )
-        summary = response.choices[0].message.content.strip()
+        # Mengganti model ke gemini-2.5-flash-lite-preview-06-17
+        model = genai.GenerativeModel('gemini-2.5-flash-lite-preview-06-17')
+        response = model.generate_content(prompt)
+        summary = response.text.strip()
         logger.info(f"Summary generated: {summary}")
         return summary
     except Exception as e:
@@ -43,12 +44,10 @@ def translate_text(text, target_lang):
             'fr': 'French'
         }
         prompt = f"Translate the following text to {language_names[target_lang]}:\n\n{text}"
-        response = client.chat.completions.create(
-            model="gpt-4.1-nano",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1000
-        )
-        translated = response.choices[0].message.content.strip()
+        # Mengganti model ke gemini-2.5-flash-lite-preview-06-17
+        model = genai.GenerativeModel('gemini-2.5-flash-lite-preview-06-17')
+        response = model.generate_content(prompt)
+        translated = response.text.strip()
         logger.info(f"Text translated to {target_lang}: {translated}")
         return translated
     except Exception as e:
